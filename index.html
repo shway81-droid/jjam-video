@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>짬짬이 영상 | 애매하게 남은 시간, 뭐 틀지?</title>
+  <meta name="description" content="애매하게 남은 수업 시간, 시간·주제·학년으로 1초 만에 찾는 선생님 전용 영상 아카이브" />
+  <link rel="icon" href="favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ── 상단 우드 프레임 헤더 ── -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🎬</span>
+      <span class="brand-title">짬짬이 영상</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="savedBtn" class="wood-btn" type="button">
+        <span>⭐ 저장함</span>
+        <span id="savedCount" class="badge">0</span>
+      </button>
+      <button id="fsBtn" class="wood-btn" type="button" title="전체화면">⛶</button>
+    </div>
+  </header>
+
+  <main class="board">
+    <!-- ── 히어로: 오늘의 추천 + 룰렛 ── -->
+    <section class="hero">
+      <div id="todayCard" class="today-card">
+        <!-- 오늘의 추천 카드가 JS로 렌더링됨 -->
+      </div>
+
+      <div class="hero-actions">
+        <button id="rouletteBtn" class="gold-btn big" type="button">🎲 룰렛으로 골라줘</button>
+        <button id="reshuffleBtn" class="gold-btn ghost" type="button">↻ 추천 새로 받기</button>
+      </div>
+    </section>
+
+    <!-- ── 필터 바 ── -->
+    <section class="filters">
+      <div class="filter-row occasion-row">
+        <span class="filter-label">📅 계기</span>
+        <div class="chips">
+          <button id="occasionChip" class="chip chip-occasion" type="button">계기교육</button>
+          <button id="calBtn" class="chip chip-cal" type="button">🗓️ 달력</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">⏱ 시간</span>
+        <div id="timeChips" class="chips"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">👥 학년</span>
+        <div id="gradeChips" class="chips"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">🏷 주제</span>
+        <div id="topicChips" class="chips wrap"></div>
+      </div>
+    </section>
+
+    <!-- ── 영상 그리드 ── -->
+    <section class="grid-head">
+      <h2 id="gridTitle">전체 영상</h2>
+      <span id="resultCount" class="result-count"></span>
+    </section>
+    <section id="grid" class="grid"></section>
+    <p id="emptyMsg" class="empty-msg" hidden>조건에 맞는 영상이 없어요. 필터를 바꿔보세요.</p>
+  </main>
+
+  <footer class="footer">
+    <p>짬짬이 영상 · 선생님을 위한 자투리 시간 영상 아카이브</p>
+  </footer>
+
+  <!-- ── 영상 재생 모달 ── -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <button class="modal-close" data-close type="button" aria-label="닫기">✕</button>
+      <div id="mPlayer" class="modal-player"></div>
+      <div class="modal-body">
+        <div class="modal-meta">
+          <span id="mTopic" class="pill"></span>
+          <span id="mTime" class="pill pill-time"></span>
+          <span id="mGrade" class="pill pill-grade"></span>
+        </div>
+        <h3 id="mTitle" class="modal-title"></h3>
+        <p id="mDesc" class="modal-desc"></p>
+        <div class="ideas">
+          <h4 class="ideas-head">🧩 이렇게 써보세요</h4>
+          <ul id="mIdeas" class="ideas-list"></ul>
+        </div>
+        <div class="modal-actions">
+          <button id="mSaveBtn" class="gold-btn" type="button">⭐ 저장</button>
+          <button id="mShareBtn" class="gold-btn ghost" type="button">🔗 공유</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 계기교육 달력 모달 ── -->
+  <div id="calModal" class="modal" hidden>
+    <div class="modal-backdrop" data-cal-close></div>
+    <div class="modal-panel cal-panel" role="dialog" aria-modal="true" aria-labelledby="calHeadTitle">
+      <button class="modal-close" data-cal-close type="button" aria-label="닫기">✕</button>
+      <div class="cal-head">
+        <h3 id="calHeadTitle">🗓️ 계기교육 달력</h3>
+        <label class="cal-datepick">날짜로 찾기
+          <input type="date" id="calDate" />
+        </label>
+      </div>
+      <p class="cal-hint">기념일을 고르면 그 날 계기교육 영상을 보여줘요. <em>주제</em> 표시는 전용 영상 대신 관련 주제 영상으로 안내합니다.</p>
+      <div id="calList" class="cal-list"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

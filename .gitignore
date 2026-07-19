@@ -1,0 +1,7 @@
+# 서브에이전트 작업 파일·중간 산출물 (배포 불필요)
+.incoming/
+
+# 의존성·OS·로그
+node_modules/
+.DS_Store
+*.log
