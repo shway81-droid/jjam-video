@@ -230,8 +230,8 @@ function matches(v) {
       if (!(v.occasions || []).includes(activeOcc.name)) return false;
     } else if (v.topic !== activeOcc.topic) return false;
   }
-  // 시간: 선택 버킷 이하(=남은 시간 안에 소화 가능)
-  if (state.time !== 'all' && v.minutes > state.time) return false;
+  // 시간: 선택한 분과 정확히 일치하는 길이만
+  if (state.time !== 'all' && v.minutes !== state.time) return false;
   if (state.grade !== 'all' && !(v.grade || []).includes(state.grade)) return false;
   if (state.topic !== 'all' && v.topic !== state.topic) return false;
   return true;
