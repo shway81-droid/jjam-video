@@ -7,7 +7,7 @@
 'use strict';
 
 // ── 상수 ──────────────────────────────────────────────────
-const TIME_BUCKETS = [3, 4, 5, 6, 7, 8, 9, 10, 11];   // 분 단위 필터 (선택 분과 정확히 일치)
+const TIME_BUCKETS = [3, 4, 5, 6, 7, 8, 9, 10];   // 분 단위 필터 (선택 분과 정확히 일치)
 const GRADES = ['저학년', '중학년', '고학년'];
 const STORAGE_KEY = 'jjamvideo:saved';
 
