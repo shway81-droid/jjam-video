@@ -159,6 +159,10 @@ body {
 .gold-btn:active { transform: translate(3px,3px); box-shadow: none; }
 .gold-btn.big { font-size: 1.2rem; padding: 14px 28px; }
 .gold-btn.ghost { background: var(--cream); }
+/* <a>로 만든 버튼(유튜브에서 보기)도 버튼처럼 보이게 */
+a.gold-btn { display: inline-block; text-decoration: none; text-align: center; line-height: 1.2; }
+/* 광고 제거 토글 켜짐 상태 */
+.wood-btn.on { background: var(--felt, #2f6b3e); color: #fff; }
 
 /* ── 필터 ── */
 .filters {
