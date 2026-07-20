@@ -58,37 +58,37 @@ async function oembed(id) {
 // youtube watch 페이지는 데이터센터/CI IP에서 봇 차단(동의창)으로 lengthSeconds를 못 읽는다.
 // 대신 공개 프록시(Invidious/Piped) API를 여러 인스턴스 폴백으로 사용한다.
 const INVIDIOUS = [
-  'https://invidious.nerdvpn.de', 'https://inv.nadeko.net', 'https://yewtu.be',
-  'https://invidious.jing.rocks', 'https://iv.melmac.space', 'https://invidious.f5.si',
+  'https://invidious.nerdvpn.de', 'https://inv.nadeko.net', 'https://invidious.jing.rocks',
 ];
 const PIPED = [
   'https://pipedapi.kavin.rocks', 'https://pipedapi.adminforge.de',
-  'https://api.piped.private.coffee', 'https://pipedapi.reallyaweso.me',
 ];
 
-async function fetchJson(url, ms = 12000) {
+async function fetchJson(url, ms = 4000) {
   const r = await fetch(url, { signal: AbortSignal.timeout(ms), headers: { 'Accept': 'application/json' } });
   if (!r.ok) throw new Error('http ' + r.status);
   return r.json();
 }
 
-// YouTube InnerTube(ANDROID 클라이언트) player API — watch 페이지와 달리 동의창에
-// 막히지 않아 데이터센터/CI IP에서도 lengthSeconds 를 안정적으로 얻는다.
+// YouTube InnerTube player API — watch 페이지(동의창)와 달리 데이터센터/CI IP에서도
+// videoDetails.lengthSeconds 를 얻을 수 있다. 클라이언트별로 응답이 다르므로
+// WEB → ANDROID → iOS 순으로 시도하고 하나라도 길이가 나오면 채택한다.
+const IT_CLIENTS = [
+  { key: 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', ua: 'Mozilla/5.0', client: { clientName: 'WEB', clientVersion: '2.20240401.00.00', hl: 'ko', gl: 'KR' } },
+  { key: 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w', ua: 'com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip', client: { clientName: 'ANDROID', clientVersion: '19.09.37', androidSdkVersion: 30, hl: 'ko', gl: 'KR' } },
+  { key: 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc', ua: 'com.google.ios.youtube/19.09.3 (iPhone14,3; U; CPU iOS 15_6 like Mac OS X)', client: { clientName: 'IOS', clientVersion: '19.09.3', hl: 'ko', gl: 'KR' } },
+];
 async function innertubeSec(id) {
-  for (let a = 0; a < 3; a++) {
+  for (const c of IT_CLIENTS) {
     try {
-      const r = await fetch('https://www.youtube.com/youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w', {
+      const r = await fetch(`https://www.youtube.com/youtubei/v1/player?key=${c.key}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip',
-        },
-        body: JSON.stringify({ videoId: id, context: { client: { clientName: 'ANDROID', clientVersion: '19.09.37', androidSdkVersion: 30, hl: 'ko', gl: 'KR' } } }),
-        signal: AbortSignal.timeout(12000),
+        headers: { 'Content-Type': 'application/json', 'User-Agent': c.ua },
+        body: JSON.stringify({ videoId: id, context: { client: c.client } }),
+        signal: AbortSignal.timeout(6000),
       });
-      if (r.ok) { const j = await r.json(); const s = Number(j?.videoDetails?.lengthSeconds || 0); if (s > 0) return s; return 0; }
-    } catch { /* 재시도 */ }
-    await sleep(600);
+      if (r.ok) { const j = await r.json(); const s = Number(j?.videoDetails?.lengthSeconds || 0); if (s > 0) return s; }
+    } catch { /* 다음 클라이언트 */ }
   }
   return 0;
 }
@@ -154,8 +154,8 @@ async function worker() {
       ideas: buildIdeas(r.job),
     });
     done++;
-    if (done % 20 === 0) process.stderr.write(`  ...${done}/${raw.length}\n`);
-    await sleep(150);
+    if (done % 10 === 0) process.stderr.write(`  ...${done}/${raw.length} (통과 ${kept.length})\n`);
+    await sleep(120);
   }
 }
 
