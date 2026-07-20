@@ -211,7 +211,7 @@
     "id": "yt-KpNLsDD7DaI",
     "title": "공감하고 소통하는 학교폭력 예방교육",
     "youtubeId": "KpNLsDD7DaI",
-    "topic": "인성",
+    "topic": "학교폭력예방",
     "grade": [
       "중학년",
       "고학년"
@@ -228,7 +228,7 @@
     "id": "yt-Nqg1Bw3njWE",
     "title": "인권지킴이 지키, 함께 지키는 디지털 인권",
     "youtubeId": "Nqg1Bw3njWE",
-    "topic": "인성",
+    "topic": "인권",
     "grade": [
       "중학년",
       "고학년"
@@ -554,7 +554,7 @@
     "id": "yt-Jc9TYv5Yhog",
     "title": "나라를 지킨 참전용사에게 '더 늦기 전에' (호국 애니메이션, 국가보훈부)",
     "youtubeId": "Jc9TYv5Yhog",
-    "topic": "생명존중",
+    "topic": "역사",
     "grade": [
       "중학년",
       "고학년"
@@ -591,7 +591,7 @@
     "id": "yt-Uae2CmoCNbQ",
     "title": "오늘은 무슨 날이에요? 6월 6일 현충일",
     "youtubeId": "Uae2CmoCNbQ",
-    "topic": "생명존중",
+    "topic": "역사",
     "grade": [
       "저학년",
       "중학년"
@@ -935,7 +935,7 @@
     "id": "yt-rHF7PIobTMg",
     "title": "지금은 다문화 시대, 다문화 교육 알아보기",
     "youtubeId": "rHF7PIobTMg",
-    "topic": "세계시민",
+    "topic": "다문화",
     "grade": [
       "중학년",
       "고학년"
@@ -952,7 +952,7 @@
     "id": "yt-Lyp4POxO8VI",
     "title": "다문화 사회를 이해하고 서로 협력해요",
     "youtubeId": "Lyp4POxO8VI",
-    "topic": "세계시민",
+    "topic": "다문화",
     "grade": [
       "중학년",
       "고학년"
@@ -1210,7 +1210,7 @@
     "id": "yt-uQefuakFleQ",
     "title": "어둠을 밝혀주는 (적십자 교육, 지식채널e)",
     "youtubeId": "uQefuakFleQ",
-    "topic": "역사",
+    "topic": "세계시민",
     "grade": [
       "중학년",
       "고학년"
@@ -5607,6 +5607,24 @@
       "통일이 되면 좋은 점 세 가지 적어 보기",
       "분단 때문에 겪는 어려움 이야기하기",
       "평화로운 통일을 위해 우리가 할 일 나누기"
+    ]
+  },
+  {
+    "id": "yt-IXjj669xHKU",
+    "title": "생명은 소중해 - 아동 생명존중 교육",
+    "youtubeId": "IXjj669xHKU",
+    "topic": "생명존중",
+    "grade": [
+      "저학년",
+      "중학년",
+      "고학년"
+    ],
+    "minutes": 5,
+    "description": "나와 친구의 생명이 얼마나 소중한지 따뜻하게 일깨워 주는 생명존중 교육 영상이에요.",
+    "ideas": [
+      "나를 아껴 주는 사람과 내가 아끼는 사람 떠올리기",
+      "힘들 때 마음을 털어놓을 수 있는 사람 정하기",
+      "친구에게 \"너는 소중해\"라고 말해 주기"
     ]
   }
 ]
