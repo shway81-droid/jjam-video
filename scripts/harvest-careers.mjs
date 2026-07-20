@@ -145,15 +145,30 @@ async function durationSec(id, idx = 0) {
   return 0;
 }
 
+// 한국어 조사 선택: 마지막 글자 받침 유무로 이/가·을/를 등을 고른다.
+// (한글이 아니면 받침 없음으로 간주 → 영문·숫자로 끝나는 직업명도 자연스럽게 처리)
+function hasBatchim(word) {
+  if (!word) return false;
+  // 끝의 괄호·공백 등은 건너뛰고 마지막 '의미 글자'로 판정.
+  for (let i = word.length - 1; i >= 0; i--) {
+    const c = word.charCodeAt(i);
+    if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28 !== 0;   // 한글 → 받침 유무
+    if ((c >= 0x30 && c <= 0x39) || (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)) return false; // 영문·숫자 → 받침 없음 취급
+    // 그 외(괄호·기호·공백) → 계속 앞으로
+  }
+  return false;
+}
+const josa = (w, withB, noB) => w + (hasBatchim(w) ? withB : noB);
+
 // 직업명 기반 설명·활용아이디어(사이트 톤에 맞춘 템플릿).
 function buildDesc(job) {
   if (!job) return '실제 직업인의 하루와 일하는 모습을 생생하게 들여다보는 진로 탐색 영상이에요.';
-  return `${job}이(가) 실제로 어떤 일을 하고 어떤 하루를 보내는지 생생하게 보여 주는 진로 탐색 영상이에요.`;
+  return `${josa(job, '이', '가')} 실제로 어떤 일을 하고 어떤 하루를 보내는지 생생하게 보여 주는 진로 탐색 영상이에요.`;
 }
 function buildIdeas(job) {
   const j = job || '이 직업';
   return [
-    `${j}이(가) 하는 일과 필요한 능력을 한 가지씩 적어 보기`,
+    `${josa(j, '이', '가')} 하는 일과 필요한 능력을 한 가지씩 적어 보기`,
     `이 직업의 좋은 점과 힘든 점을 짝과 이야기 나누기`,
     `내 흥미·강점과 이 직업이 어울리는지 별점으로 표시하고 이유 말하기`,
   ];
@@ -185,7 +200,8 @@ async function worker() {
     if (minutes < MIN_MIN || minutes > MAX_MIN) { dropped.push({ ...r, why: `길이 ${minutes}분(범위밖)`, sec }); done++; await sleep(80); continue; }
     kept.push({
       id: `yt-${r.id}`,
-      title: title || r.job || '진로 영상',
+      // 카드 제목: 직업명 우선(간결). 직업명이 없으면 실제 유튜브 제목.
+      title: r.job || title || '진로 영상',
       youtubeId: r.id,
       topic: '진로',
       grade: ['중학년', '고학년'],
