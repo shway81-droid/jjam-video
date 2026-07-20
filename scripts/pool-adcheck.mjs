@@ -37,7 +37,7 @@ await Promise.all(Array.from({ length: 3 }, worker));
 
 fs.writeFileSync(path.join(INC, 'pool-adfree.json'), JSON.stringify(res.noad, null, 1));
 fs.writeFileSync(path.join(INC, 'pool-unknown.json'), JSON.stringify(res.unknown, null, 1));
-const ORDER = ['인성','진로','건강·보건','자기주도학습','생명존중','세계시민','가족','역사','다문화','학교폭력예방','힐링·재미','경제','인권','독도','민주시민','예술·문화','스포츠','AI교육','미디어리터러시','장애인식개선','안전','과학·탐구','학급자치','통일','환경생태'];
+const ORDER = ['인성','진로','건강·보건','생명존중','세계시민','가족','역사','다문화','학교폭력예방','힐링·재미','경제','인권','독도','민주시민','예술·문화','스포츠','AI교육','미디어리터러시','장애인식개선','안전','과학·탐구','학급자치','통일','환경생태'];
 const tc = {}; res.noad.forEach(v => tc[v.topic] = (tc[v.topic] || 0) + 1);
 console.log(`\n===== 확정 무광고 집계 =====`);
 console.log(`후보 ${pool.length} · 무광고 ${res.noad.length} · 광고 ${res.ad.length} · 미확인 ${res.unknown.length}`);

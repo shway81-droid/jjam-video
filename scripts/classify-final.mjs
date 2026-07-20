@@ -73,6 +73,6 @@ fs.writeFileSync(path.join(INC, 'remove.json'), JSON.stringify(remove, null, 1))
 
 console.error(`\n무광고(keep): ${keep.length}편 · 광고/미확인(remove): ${remove.length}편`);
 const tc = {}; keep.forEach(v => tc[v.topic] = (tc[v.topic] || 0) + 1);
-const ORDER = ['인성','진로','건강·보건','자기주도학습','생명존중','세계시민','가족','역사','다문화','학교폭력예방','힐링·재미','경제','인권','독도','민주시민','예술·문화','스포츠','AI교육','미디어리터러시','장애인식개선','안전','과학·탐구','학급자치','통일','환경생태'];
+const ORDER = ['인성','진로','건강·보건','생명존중','세계시민','가족','역사','다문화','학교폭력예방','힐링·재미','경제','인권','독도','민주시민','예술·문화','스포츠','AI교육','미디어리터러시','장애인식개선','안전','과학·탐구','학급자치','통일','환경생태'];
 console.error('\n주제별 무광고 잔존 수:');
 ORDER.forEach(t => console.error(`  ${t}: ${tc[t] || 0}`));
