@@ -68,6 +68,12 @@ let saved = loadSaved();
 
 // ── DOM ───────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
+
+// 프리미엄 광고 제거: 켜면 임베드를 youtube.com(유튜브 로그인 적용)으로,
+// 끄면 youtube-nocookie.com(쿠키·로그인 미적용, 기본)으로 재생한다.
+const PREMIUM_KEY = 'jjam-premium-adfree';
+let premiumOn = localStorage.getItem(PREMIUM_KEY) === '1';
+const embedHost = () => (premiumOn ? 'www.youtube.com' : 'www.youtube-nocookie.com');
 const grid        = $('grid');
 const emptyMsg    = $('emptyMsg');
 const gridTitle   = $('gridTitle');
@@ -346,11 +352,13 @@ function openModal(v) {
   const player = $('mPlayer');
   if (v.youtubeId && v.youtubeId !== 'SAMPLE') {
     player.innerHTML =
-      `<iframe src="https://www.youtube-nocookie.com/embed/${v.youtubeId}?rel=0&autoplay=1"
+      `<iframe src="https://${embedHost()}/embed/${v.youtubeId}?rel=0&autoplay=1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen title="${escapeHtml(v.title)}"></iframe>`;
+    $('mYtBtn').href = `https://www.youtube.com/watch?v=${v.youtubeId}`;
   } else {
     player.innerHTML = `<div class="ph">예시 영상입니다.<br>data/videos.json의 youtubeId를<br>실제 유튜브 영상 ID로 교체하세요.</div>`;
+    $('mYtBtn').removeAttribute('href');
   }
   $('mTopic').textContent = v.topic;
   $('mTime').textContent  = `${v.minutes}분`;
@@ -382,6 +390,13 @@ function updateSaveBtn() {
   const on = modalVideo && saved.has(modalVideo.id);
   b.textContent = on ? '⭐ 저장됨' : '⭐ 저장';
   b.classList.toggle('ghost', !on);
+}
+function updatePremiumBtn() {
+  const b = $('premiumBtn');
+  if (!b) return;
+  b.textContent = premiumOn ? '✅ 광고 제거 켜짐' : '🚫 광고 제거';
+  b.classList.toggle('on', premiumOn);
+  b.setAttribute('aria-pressed', premiumOn ? 'true' : 'false');
 }
 
 // ── 공유 ──────────────────────────────────────────────────
@@ -429,6 +444,23 @@ function bindEvents() {
   $('fsBtn').addEventListener('click', () => {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen?.();
+  });
+
+  // 프리미엄 광고 제거 토글
+  updatePremiumBtn();
+  $('premiumBtn').addEventListener('click', () => {
+    premiumOn = !premiumOn;
+    localStorage.setItem(PREMIUM_KEY, premiumOn ? '1' : '0');
+    updatePremiumBtn();
+    if (premiumOn && !localStorage.getItem('jjam-premium-tip')) {
+      localStorage.setItem('jjam-premium-tip', '1');
+      alert('유튜브 프리미엄 회원이면 이제 영상 재생 시 광고가 제거됩니다.\n\n'
+        + '· 브라우저에 유튜브(youtube.com) 로그인이 되어 있어야 해요.\n'
+        + '· 광고가 계속 보이면 브라우저의 "타사 쿠키 차단"을 풀거나,\n'
+        + '  영상 아래 "▶ 유튜브에서 보기"로 열면 확실히 광고 없이 볼 수 있어요.');
+    }
+    // 재생 중이면 새 설정으로 다시 로드
+    if (modalVideo && !$('modal').hidden) openModal(modalVideo);
   });
 
   $('mSaveBtn').addEventListener('click', () => {
