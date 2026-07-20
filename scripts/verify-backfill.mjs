@@ -39,7 +39,7 @@ for (const c of toCheck) { const r = await hasAds(chan[c][0]); chanStatus[c] = r
 // 4) 광고 채널 영상 제거
 const removeIds = new Set();
 bfVideos.forEach(v => { const a = authors.get(v.youtubeId) || '?'; if (chanStatus[a] !== 'noad') removeIds.add(v.youtubeId); });
-const TOPIC_ORDER = ['인성','진로','건강·보건','자기주도학습','생명존중','세계시민','가족','역사','다문화','학교폭력예방','힐링·재미','경제','인권','독도','민주시민','예술·문화','스포츠','AI교육','미디어리터러시','장애인식개선','안전','과학·탐구','학급자치','통일','환경생태'];
+const TOPIC_ORDER = ['인성','진로','건강·보건','생명존중','세계시민','가족','역사','다문화','학교폭력예방','힐링·재미','경제','인권','독도','민주시민','예술·문화','스포츠','AI교육','미디어리터러시','장애인식개선','안전','과학·탐구','학급자치','통일','환경생태'];
 videos = videos.filter(v => !removeIds.has(v.youtubeId));
 videos.sort((a, b) => TOPIC_ORDER.indexOf(a.topic) - TOPIC_ORDER.indexOf(b.topic));
 fs.writeFileSync(OUT, JSON.stringify(videos, null, 2) + '\n', 'utf-8');
