@@ -6,10 +6,12 @@
  *
  * 입력: scripts/careers-input.json  [{ n, job, id }]  (직업명 + 유튜브 11자리 ID)
  *
- * 각 ID에 대해:
- *   1) YouTube oEmbed → 실제 제목·채널 + 임베드(재생) 가능 여부
- *   2) Invidious/Piped 공개 API → 영상 길이(초)
- *      (youtube watch 페이지는 데이터센터/CI IP에서 봇 차단되어 길이를 못 읽으므로 프록시 사용)
+ * 길이·제목 확보 방법:
+ *   • YT_API_KEY 환경변수가 있으면 → YouTube Data API v3 (권장·정확).
+ *     공식 API라 GitHub Actions 등 데이터센터 IP에서도 봇 차단 없이 동작한다.
+ *   • 키가 없으면 → oEmbed(제목) + InnerTube/Invidious/Piped(길이).
+ *     단, YouTube가 데이터센터 IP의 길이 조회를 광범위하게 차단하므로 CI에선 대부분 실패한다.
+ *     이 경로는 사용자 PC(주거용 IP) 등에서만 안정적으로 동작한다.
  * 통과 기준(이 사이트의 "짬짬이" 원칙):
  *   - 임베드 가능
  *   - 길이 3~10분 (TIME_BUCKETS 범위 = 정확일치 필터 대상)
@@ -36,6 +38,9 @@ const MIN_MIN = 3, MAX_MIN = 10;                 // TIME_BUCKETS 범위
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 fs.mkdirSync(path.join(ROOT, '.incoming'), { recursive: true });
+console.log(process.env.YT_API_KEY
+  ? '· 길이·제목 조회: YouTube Data API v3 (권장)'
+  : '· 길이·제목 조회: oEmbed+InnerTube/프록시 (키 없음 — CI에선 대부분 실패, 주거용 IP 권장)');
 const videos = JSON.parse(fs.readFileSync(VIDEOS, 'utf-8'));
 const existing = new Set(videos.map(v => v.youtubeId));
 const raw = JSON.parse(fs.readFileSync(RAW, 'utf-8'));
@@ -93,6 +98,30 @@ async function innertubeSec(id) {
   return 0;
 }
 
+// ── YouTube Data API v3 (권장) ────────────────────────────
+// 공식 API라 데이터센터/CI IP에서도 봇 차단 없이 길이·제목·임베드여부를 정확히 준다.
+// 환경변수 YT_API_KEY 가 있으면 최우선 사용. (videos.list 1건당 1 unit, 180편=180 unit)
+const YT_KEY = process.env.YT_API_KEY || '';
+function iso8601ToSec(s) {
+  const m = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(s || '');
+  if (!m) return 0;
+  return (+(m[1] || 0)) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0));
+}
+async function dataApiMeta(id) {
+  try {
+    const j = await fetchJson(
+      `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet,status&id=${id}&key=${YT_KEY}`, 8000);
+    const it = j.items && j.items[0];
+    if (!it) return { exists: false };
+    return {
+      exists: true,
+      sec: iso8601ToSec(it.contentDetails?.duration),
+      title: it.snippet?.title || '',
+      embeddable: it.status?.embeddable !== false,
+    };
+  } catch { return { exists: true, sec: 0 }; }   // API 오류 → 길이확인실패로 처리
+}
+
 // idx 로 인스턴스를 회전시켜 특정 인스턴스에 부하가 몰리지 않게 한다.
 async function durationSec(id, idx = 0) {
   const it = await innertubeSec(id);
@@ -136,16 +165,27 @@ let blockedCount = 0, i = 0, done = 0;
 async function worker() {
   while (i < raw.length) {
     const idx = i, r = raw[i++];
-    const emb = await oembed(r.id);
-    if (emb.blocked) { blockedCount++; done++; continue; }
-    if (!emb.ok) { dropped.push({ ...r, why: emb.reason }); done++; await sleep(120); continue; }
-    const sec = await durationSec(r.id, idx);
+    let title = '', sec = 0, embeddable = true, why = null;
+    if (YT_KEY) {
+      // 권장 경로: 공식 Data API 한 번으로 제목·길이·임베드여부 확보.
+      const d = await dataApiMeta(r.id);
+      if (d.exists === false) why = '삭제/비공개';
+      else { title = d.title; sec = d.sec; embeddable = d.embeddable; }
+    } else {
+      // 키 없음: oEmbed(제목·임베드) + InnerTube/프록시(길이). CI에서는 길이 조회가 자주 막힘.
+      const emb = await oembed(r.id);
+      if (emb.blocked) { blockedCount++; done++; continue; }
+      if (!emb.ok) why = emb.reason;
+      else { title = emb.title; sec = await durationSec(r.id, idx); }
+    }
+    if (why) { dropped.push({ ...r, why }); done++; await sleep(80); continue; }
+    if (!embeddable) { dropped.push({ ...r, why: '임베드차단' }); done++; await sleep(80); continue; }
     const minutes = Math.round(sec / 60);
-    if (!sec) { dropped.push({ ...r, why: '길이확인실패(프록시 응답없음)' }); done++; await sleep(120); continue; }
-    if (minutes < MIN_MIN || minutes > MAX_MIN) { dropped.push({ ...r, why: `길이 ${minutes}분(범위밖)`, sec }); done++; await sleep(120); continue; }
+    if (!sec) { dropped.push({ ...r, why: '길이확인실패' }); done++; await sleep(80); continue; }
+    if (minutes < MIN_MIN || minutes > MAX_MIN) { dropped.push({ ...r, why: `길이 ${minutes}분(범위밖)`, sec }); done++; await sleep(80); continue; }
     kept.push({
       id: `yt-${r.id}`,
-      title: emb.title || r.job || '진로 영상',
+      title: title || r.job || '진로 영상',
       youtubeId: r.id,
       topic: '진로',
       grade: ['중학년', '고학년'],
@@ -155,7 +195,7 @@ async function worker() {
     });
     done++;
     if (done % 10 === 0) process.stderr.write(`  ...${done}/${raw.length} (통과 ${kept.length})\n`);
-    await sleep(120);
+    await sleep(80);
   }
 }
 

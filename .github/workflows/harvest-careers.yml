@@ -34,6 +34,10 @@ jobs:
           node-version: '20'
 
       - name: 유튜브에서 메타데이터 수집 → videos.json 병합
+        # YT_API_KEY 시크릿이 있으면 YouTube Data API v3 로 정확히 조회한다(권장).
+        # 없으면 프록시 폴백으로 시도하지만 데이터센터 IP에선 대부분 실패한다.
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
         run: node scripts/harvest-careers.mjs --write
 
       - name: 통과분 백업 업로드(복구용)
