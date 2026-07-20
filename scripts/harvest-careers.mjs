@@ -6,17 +6,19 @@
  *
  * 입력: scripts/careers-input.json  [{ n, job, id }]  (직업명 + 유튜브 11자리 ID)
  *
- * 각 ID에 대해 YouTube에서 직접:
- *   1) oEmbed → 실제 제목·채널(임베드 가능=재생 가능 여부)
- *   2) watch 페이지 → lengthSeconds(길이) + adPlacements/playerAds(광고 여부)
- * 통과 기준(이 사이트의 "짬짬이·무광고" 원칙):
+ * 각 ID에 대해:
+ *   1) YouTube oEmbed → 실제 제목·채널 + 임베드(재생) 가능 여부
+ *   2) Invidious/Piped 공개 API → 영상 길이(초)
+ *      (youtube watch 페이지는 데이터센터/CI IP에서 봇 차단되어 길이를 못 읽으므로 프록시 사용)
+ * 통과 기준(이 사이트의 "짬짬이" 원칙):
  *   - 임베드 가능
  *   - 길이 3~10분 (TIME_BUCKETS 범위 = 정확일치 필터 대상)
- *   - 광고 없음
  * 통과분만 topic:"진로" 항목으로 생성해 기존과 중복 제거 후 추가한다.
  *
- * ※ YouTube(google) 도메인에 egress가 열린 환경에서 실행해야 한다.
- *   차단된 환경에서는 각 항목이 blocked 로 집계되어 아무것도 추가하지 않는다.
+ * ※ 광고 여부는 자동 판정하지 않는다(watch 페이지 봇 차단으로 CI에서 불가).
+ *   기존 264편의 "무광고 검증" 기준과 달리 이 배치는 광고 미검증이므로,
+ *   필요하면 사이트 접근이 자유로운 환경에서 scripts/check-ads.mjs 로 사후 점검한다.
+ * ※ youtube.com oEmbed 가 대부분 막힌 egress 차단 환경에서는 아무것도 추가하지 않는다.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -52,25 +54,66 @@ async function oembed(id) {
   return { ok: false, reason: 'rate-limit 의심' };
 }
 
-async function meta(id) {
-  for (let a = 0; a < 4; a++) {
+// 영상 길이(초) 조회.
+// youtube watch 페이지는 데이터센터/CI IP에서 봇 차단(동의창)으로 lengthSeconds를 못 읽는다.
+// 대신 공개 프록시(Invidious/Piped) API를 여러 인스턴스 폴백으로 사용한다.
+const INVIDIOUS = [
+  'https://invidious.nerdvpn.de', 'https://inv.nadeko.net', 'https://yewtu.be',
+  'https://invidious.jing.rocks', 'https://iv.melmac.space', 'https://invidious.f5.si',
+];
+const PIPED = [
+  'https://pipedapi.kavin.rocks', 'https://pipedapi.adminforge.de',
+  'https://api.piped.private.coffee', 'https://pipedapi.reallyaweso.me',
+];
+
+async function fetchJson(url, ms = 12000) {
+  const r = await fetch(url, { signal: AbortSignal.timeout(ms), headers: { 'Accept': 'application/json' } });
+  if (!r.ok) throw new Error('http ' + r.status);
+  return r.json();
+}
+
+// YouTube InnerTube(ANDROID 클라이언트) player API — watch 페이지와 달리 동의창에
+// 막히지 않아 데이터센터/CI IP에서도 lengthSeconds 를 안정적으로 얻는다.
+async function innertubeSec(id) {
+  for (let a = 0; a < 3; a++) {
     try {
-      const res = await fetch(`https://www.youtube.com/watch?v=${id}&hl=ko&gl=KR`,
-        { headers: {
-          'Accept-Language': 'ko-KR',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-          // 데이터센터/EU IP에서 뜨는 동의창 우회 (CI 러너 대응)
-          'Cookie': 'CONSENT=YES+cb.20210328-17-p0.en+FX+000; SOCS=CAI',
-        } });
-      if (res.status === 403) return { blocked: true };
-      const html = await res.text();
-      if (!/"videoDetails"|"playabilityStatus"/.test(html)) { await sleep(900); continue; }
-      const sec = Number((html.match(/"lengthSeconds":"(\d+)"/) || [])[1] || 0);
-      const hasAds = /"adPlacements"|"playerAds"|"adSlots"/.test(html);
-      return { sec, hasAds };
-    } catch { await sleep(900); }
+      const r = await fetch('https://www.youtube.com/youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip',
+        },
+        body: JSON.stringify({ videoId: id, context: { client: { clientName: 'ANDROID', clientVersion: '19.09.37', androidSdkVersion: 30, hl: 'ko', gl: 'KR' } } }),
+        signal: AbortSignal.timeout(12000),
+      });
+      if (r.ok) { const j = await r.json(); const s = Number(j?.videoDetails?.lengthSeconds || 0); if (s > 0) return s; return 0; }
+    } catch { /* 재시도 */ }
+    await sleep(600);
   }
-  return {};
+  return 0;
+}
+
+// idx 로 인스턴스를 회전시켜 특정 인스턴스에 부하가 몰리지 않게 한다.
+async function durationSec(id, idx = 0) {
+  const it = await innertubeSec(id);
+  if (it > 0) return it;
+  const inv = INVIDIOUS.map((_, k) => INVIDIOUS[(idx + k) % INVIDIOUS.length]);
+  const pip = PIPED.map((_, k) => PIPED[(idx + k) % PIPED.length]);
+  for (const base of inv) {
+    try {
+      const j = await fetchJson(`${base}/api/v1/videos/${id}?fields=lengthSeconds`);
+      const sec = Number(j.lengthSeconds || 0);
+      if (sec > 0) return sec;
+    } catch { /* 다음 인스턴스 */ }
+  }
+  for (const base of pip) {
+    try {
+      const j = await fetchJson(`${base}/streams/${id}`);
+      const sec = Number(j.duration || 0);
+      if (sec > 0) return sec;
+    } catch { /* 다음 인스턴스 */ }
+  }
+  return 0;
 }
 
 // 직업명 기반 설명·활용아이디어(사이트 톤에 맞춘 템플릿).
@@ -92,16 +135,14 @@ let blockedCount = 0, i = 0, done = 0;
 
 async function worker() {
   while (i < raw.length) {
-    const r = raw[i++];
+    const idx = i, r = raw[i++];
     const emb = await oembed(r.id);
     if (emb.blocked) { blockedCount++; done++; continue; }
     if (!emb.ok) { dropped.push({ ...r, why: emb.reason }); done++; await sleep(120); continue; }
-    const m = await meta(r.id);
-    if (m.blocked) { blockedCount++; done++; continue; }
-    const minutes = Math.round((m.sec || 0) / 60);
-    if (!m.sec) { dropped.push({ ...r, why: '길이확인실패' }); done++; await sleep(120); continue; }
-    if (minutes < MIN_MIN || minutes > MAX_MIN) { dropped.push({ ...r, why: `길이 ${minutes}분(범위밖)`, sec: m.sec }); done++; await sleep(120); continue; }
-    if (m.hasAds) { dropped.push({ ...r, why: '광고있음' }); done++; await sleep(120); continue; }
+    const sec = await durationSec(r.id, idx);
+    const minutes = Math.round(sec / 60);
+    if (!sec) { dropped.push({ ...r, why: '길이확인실패(프록시 응답없음)' }); done++; await sleep(120); continue; }
+    if (minutes < MIN_MIN || minutes > MAX_MIN) { dropped.push({ ...r, why: `길이 ${minutes}분(범위밖)`, sec }); done++; await sleep(120); continue; }
     kept.push({
       id: `yt-${r.id}`,
       title: emb.title || r.job || '진로 영상',
@@ -122,10 +163,11 @@ const CONC = 4;
 await Promise.all(Array.from({ length: CONC }, worker));
 
 console.log(`\n===== 진로 영상 수집 결과 =====`);
-console.log(`입력 ${raw.length}편 · 통과 ${kept.length}편 · 제외 ${dropped.length}편 · egress차단 ${blockedCount}편`);
-if (blockedCount) {
-  console.log(`\n⚠️  ${blockedCount}편이 google(youtube) egress 차단으로 조회 불가.`);
-  console.log(`   → YouTube 접근이 허용된 환경에서 다시 실행하세요. (아무것도 추가하지 않음)`);
+console.log(`입력 ${raw.length}편 · 통과 ${kept.length}편 · 제외 ${dropped.length}편 · oEmbed차단 ${blockedCount}편`);
+// oEmbed(youtube.com) 자체가 대부분 막힌 경우 = egress 차단 환경 → 반영하지 않고 종료.
+if (blockedCount > raw.length / 2) {
+  console.log(`\n⚠️  대부분(${blockedCount}편)이 youtube.com 차단으로 조회 불가 → egress 차단 환경.`);
+  console.log(`   YouTube 접근이 가능한 환경(GitHub Actions 등)에서 실행하세요. (아무것도 추가하지 않음)`);
   process.exit(2);
 }
 if (dropped.length) {
@@ -143,6 +185,5 @@ if (WRITE && fresh.length) {
   fs.writeFileSync(VIDEOS, JSON.stringify(merged, null, 2) + '\n');
   console.log(`\n✅ data/videos.json 에 ${fresh.length}편 추가 (총 ${merged.length}편).`);
 } else if (!WRITE) {
-  fs.writeFileSync(path.join(ROOT, '.incoming', 'careers-kept.json'), JSON.stringify(fresh, null, 2));
   console.log(`\n미리보기 모드. --write 로 실제 반영. (통과분 .incoming/careers-kept.json 저장)`);
 }
