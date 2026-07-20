@@ -33,6 +33,7 @@ const WRITE = process.argv.includes('--write');
 const MIN_MIN = 3, MAX_MIN = 10;                 // TIME_BUCKETS 범위
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+fs.mkdirSync(path.join(ROOT, '.incoming'), { recursive: true });
 const videos = JSON.parse(fs.readFileSync(VIDEOS, 'utf-8'));
 const existing = new Set(videos.map(v => v.youtubeId));
 const raw = JSON.parse(fs.readFileSync(RAW, 'utf-8'));
@@ -54,8 +55,13 @@ async function oembed(id) {
 async function meta(id) {
   for (let a = 0; a < 4; a++) {
     try {
-      const res = await fetch(`https://www.youtube.com/watch?v=${id}&hl=ko`,
-        { headers: { 'Accept-Language': 'ko-KR', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' } });
+      const res = await fetch(`https://www.youtube.com/watch?v=${id}&hl=ko&gl=KR`,
+        { headers: {
+          'Accept-Language': 'ko-KR',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+          // 데이터센터/EU IP에서 뜨는 동의창 우회 (CI 러너 대응)
+          'Cookie': 'CONSENT=YES+cb.20210328-17-p0.en+FX+000; SOCS=CAI',
+        } });
       if (res.status === 403) return { blocked: true };
       const html = await res.text();
       if (!/"videoDetails"|"playabilityStatus"/.test(html)) { await sleep(900); continue; }
@@ -130,6 +136,8 @@ if (dropped.length) {
 const fresh = kept.filter(v => !existing.has(v.youtubeId));
 console.log(`\n통과 ${kept.length}편 중 신규 ${fresh.length}편(기존중복 ${kept.length - fresh.length} 제외).`);
 
+// 통과분은 항상 백업(아티팩트/복구용).
+fs.writeFileSync(path.join(ROOT, '.incoming', 'careers-kept.json'), JSON.stringify(fresh, null, 2));
 if (WRITE && fresh.length) {
   const merged = videos.concat(fresh);
   fs.writeFileSync(VIDEOS, JSON.stringify(merged, null, 2) + '\n');

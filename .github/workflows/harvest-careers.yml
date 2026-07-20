@@ -1,0 +1,58 @@
+name: 진로 영상 수집·반영
+
+# 진로교육 영상 180편을 유튜브에서 실제 길이·제목·광고여부로 검증해
+# 3~10분·무광고만 data/videos.json에 병합한다.
+# GitHub 러너는 유튜브 접근이 가능하므로 egress 차단 환경 대신 여기서 실행한다.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/work-status-check-fvi48w
+    paths:
+      - 'scripts/harvest-careers.mjs'
+      - 'scripts/careers-input.json'
+      - '.github/workflows/harvest-careers.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: harvest-careers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 유튜브에서 메타데이터 수집 → videos.json 병합
+        run: node scripts/harvest-careers.mjs --write
+
+      - name: 통과분 백업 업로드(복구용)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: careers-kept
+          path: .incoming/careers-kept.json
+          if-no-files-found: warn
+
+      - name: 변경분 커밋·푸시
+        run: |
+          if git diff --quiet -- data/videos.json; then
+            echo "추가된 영상 없음 — 커밋 생략."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          total=$(node -e "console.log(require('./data/videos.json').length)")
+          git add data/videos.json
+          git commit -m "진로 영상 자동 반영: 유튜브 검증 통과분 추가 (총 ${total}편) [skip ci]"
+          git push
