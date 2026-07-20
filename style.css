@@ -163,6 +163,17 @@ body {
 a.gold-btn { display: inline-block; text-decoration: none; text-align: center; line-height: 1.2; }
 /* 광고 제거 토글 켜짐 상태 */
 .wood-btn.on { background: var(--felt, #2f6b3e); color: #fff; }
+/* 프리미엄 안내 문구 */
+.premium-note {
+  margin: 10px 2px 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted, #6c7361);
+  background: color-mix(in srgb, var(--gold, #b4832a) 12%, transparent);
+  border-radius: 10px;
+  padding: 9px 12px;
+}
+.premium-note b { color: var(--ink, #232a20); }
 
 /* ── 필터 ── */
 .filters {

@@ -394,7 +394,7 @@ function updateSaveBtn() {
 function updatePremiumBtn() {
   const b = $('premiumBtn');
   if (!b) return;
-  b.textContent = premiumOn ? '✅ 광고 제거 켜짐' : '🚫 광고 제거';
+  b.textContent = premiumOn ? '✅ 광고 제거 켜짐(프리미엄)' : '🚫 광고 제거(프리미엄)';
   b.classList.toggle('on', premiumOn);
   b.setAttribute('aria-pressed', premiumOn ? 'true' : 'false');
 }
