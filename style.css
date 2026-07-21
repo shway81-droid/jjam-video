@@ -39,7 +39,9 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 24px;
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 14px 20px;
   background: var(--navy);
   box-shadow: 0 10px 24px rgba(21,36,71,0.18);
   position: sticky;
