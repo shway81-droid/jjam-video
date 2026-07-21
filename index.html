@@ -30,16 +30,20 @@
     </div>
   </header>
 
+  <!-- ── 안내 문구 + CTA 스트립 (헤더 바로 아래) ── -->
+  <div class="cta-strip">
+    <p class="cta-copy"><b>수업 자투리 시간,</b> 준비 없이 바로 트는 교육 영상 <b id="ctaCount">425</b>편 · 설치 없음 · 로그인 없음</p>
+    <div class="cta-actions">
+      <button id="rouletteBtn" class="roulette-cta" type="button">🎲 룰렛으로 골라줘</button>
+      <button id="reshuffleBtn" class="reshuffle-cta" type="button">↻ 추천 새로 받기</button>
+    </div>
+  </div>
+
   <main class="board">
-    <!-- ── 히어로: 오늘의 추천 + 룰렛 ── -->
+    <!-- ── 히어로: 오늘의 추천 ── -->
     <section class="hero">
       <div id="todayCard" class="today-card">
         <!-- 오늘의 추천 카드가 JS로 렌더링됨 -->
-      </div>
-
-      <div class="hero-actions">
-        <button id="rouletteBtn" class="gold-btn big" type="button">🎲 룰렛으로 골라줘</button>
-        <button id="reshuffleBtn" class="gold-btn ghost" type="button">↻ 추천 새로 받기</button>
       </div>
     </section>
 
