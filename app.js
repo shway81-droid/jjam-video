@@ -561,6 +561,8 @@ async function init() {
   try {
     const res = await fetch('data/videos.json', { cache: 'no-cache' });
     VIDEOS = await res.json();
+    const ctaCount = document.getElementById('ctaCount');
+    if (ctaCount) ctaCount.textContent = VIDEOS.length;
   } catch (e) {
     grid.innerHTML = '';
     emptyMsg.hidden = false;
