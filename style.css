@@ -46,14 +46,17 @@ body {
   top: 0;
   z-index: 20;
 }
-.brand { display: flex; align-items: center; gap: 10px; }
-.brand-icon { font-size: 1.7rem; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo-mark { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { border-radius: 12px; display: block; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-title {
   font-size: 1.45rem;
   font-weight: 900;
   color: #fff;
   letter-spacing: -0.01em;
 }
+.brand-sub { font-size: 0.8rem; color: #9DB0D8; font-weight: 600; }
 .topbar-actions { display: flex; gap: 10px; }
 
 /* 헤더 토글 버튼 (광고 제거·저장함·전체화면) */
