@@ -49,6 +49,14 @@
 
     <!-- ── 필터 바 ── -->
     <section class="filters">
+      <div class="filter-row search-row">
+        <span class="filter-label">🔍 검색</span>
+        <div class="search-box">
+          <input type="search" id="searchInput" placeholder="제목·내용으로 찾기 (예: 독도, 지진, 광복절)"
+            autocomplete="off" enterkeyhint="search" aria-label="영상 검색" />
+          <button id="searchClear" class="search-clear" type="button" aria-label="검색어 지우기" hidden>✕</button>
+        </div>
+      </div>
       <div class="filter-row occasion-row">
         <span class="filter-label">📅 계기</span>
         <div class="chips">

@@ -31,12 +31,12 @@ const CALENDAR = [
   { md: '10-03', name: '개천절',            topic: '역사' },
   { md: '10-09', name: '한글날',            topic: '예술·문화' },
   { md: '10-25', name: '독도의 날',         topic: '독도' },
-  // jaturi 계기 확장 (음력 명절은 2026년 근사치)
-  { md: '02-17', name: '설날',              topic: '가족' },
+  // jaturi 계기 확장 (음력 명절은 lunar 표시 → LUNAR_MD에서 연도별 날짜를 찾음)
+  { lunar: true,  name: '설날',             topic: '가족' },
   { md: '04-19', name: '4·19 혁명 기념일',   topic: '민주시민' },
-  { md: '05-24', name: '부처님오신날',       topic: '인성' },
+  { lunar: true,  name: '부처님오신날',      topic: '인성' },
   { md: '07-08', name: '정보보호의 날',      topic: '미디어리터러시' },
-  { md: '09-25', name: '추석',              topic: '가족' },
+  { lunar: true,  name: '추석',             topic: '가족' },
   { md: '10-01', name: '국군의 날',          topic: '역사' },
   { md: '11-09', name: '소방의 날',          topic: '안전' },
   { md: '11-11', name: '농업인의 날',        topic: '경제' },
@@ -56,6 +56,32 @@ const CALENDAR = [
   { md: '11-17', name: '순국선열의 날',          topic: '역사' },
 ];
 
+// 음력 명절의 연도별 양력 날짜 (한국천문연구원 음양력 데이터 기준).
+// 표의 마지막 연도가 다가오면 여기에 연도만 추가하면 된다.
+// 표에 없는 연도는 달력·계기 후보에서 자동으로 빠진다(잘못된 날짜로 표시되는 일 없음).
+const LUNAR_MD = {
+  '설날': {          // 음력 1월 1일
+    2025: '01-29', 2026: '02-17', 2027: '02-07', 2028: '01-27',
+    2029: '02-13', 2030: '02-03', 2031: '01-23', 2032: '02-11',
+    2033: '01-31', 2034: '02-19', 2035: '02-08', 2036: '01-28',
+  },
+  '부처님오신날': {   // 음력 4월 8일
+    2025: '05-05', 2026: '05-24', 2027: '05-13', 2028: '05-02',
+    2029: '05-20', 2030: '05-09', 2031: '05-28', 2032: '05-16',
+    2033: '05-06', 2034: '05-25', 2035: '05-15', 2036: '05-03',
+  },
+  '추석': {          // 음력 8월 15일
+    2025: '10-06', 2026: '09-25', 2027: '09-15', 2028: '10-03',
+    2029: '09-22', 2030: '09-12', 2031: '10-01', 2032: '09-19',
+    2033: '09-08', 2034: '09-27', 2035: '09-16', 2036: '10-04',
+  },
+};
+
+// 계기의 해당 연도 'MM-DD' — 양력은 md 그대로, 음력은 LUNAR_MD에서 조회(없으면 null)
+function calMd(o, year) {
+  return o.lunar ? (LUNAR_MD[o.name] || {})[year] || null : o.md;
+}
+
 // 주제 표시 순서(데이터에 없는 주제는 자동으로 뒤에 붙음)
 const TOPIC_ORDER = [
   '인성', '진로', '건강·보건', '생명존중', '세계시민',
@@ -71,9 +97,11 @@ const state = {
   time: 'all',
   grade: 'all',
   topic: 'all',
+  q: '',               // 검색어(원문 — 화면 표시용)
   savedOnly: false,
   occasionOn: false,   // 계기교육 칩 활성 여부
 };
+let normQ = '';        // 정규화된 검색어(비교용) — 입력 시 갱신
 let OCCASION = null;        // 오늘 또는 가장 가까운 다가오는 계기 { name, topic, md, diff, m, d }
 let activeOcc = null;        // 현재 필터 중인 계기(오늘 계기 또는 달력에서 고른 계기)
 let occasionHasTags = false; // 현재 계기 전용 영상(occasions 태그)이 있는지
@@ -118,6 +146,8 @@ function gradeLabel(v) {
   return v.grade.join('·');
 }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+// 검색 비교용 정규화 — 소문자화 + 공백 제거('지식 채널'로 '지식채널e'도 찾도록)
+function norm(s) { return String(s).toLowerCase().replace(/\s+/g, ''); }
 
 // ── 필터 칩 렌더링 ────────────────────────────────────────
 function makeChip(label, active, onClick) {
@@ -166,14 +196,16 @@ function findOccasion() {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   let best = null, bestDiff = Infinity;
   for (const o of CALENDAR) {
-    const [mm, dd] = o.md.split('-').map(Number);
-    // 올해·내년 후보를 모두 보고 연말 wrap 처리
+    // 올해·내년 후보를 모두 보고 연말 wrap 처리 (음력은 연도마다 날짜가 다름)
     for (const yy of [now.getFullYear(), now.getFullYear() + 1]) {
+      const md = calMd(o, yy);
+      if (!md) continue;
+      const [mm, dd] = md.split('-').map(Number);
       const d = new Date(yy, mm - 1, dd);
       const diff = Math.round((d - today) / 86400000);
       if (diff >= 0 && diff < bestDiff) {
         bestDiff = diff;
-        best = { ...o, m: mm, d: dd, diff };
+        best = { ...o, md, m: mm, d: dd, diff };
       }
     }
   }
@@ -190,17 +222,23 @@ function renderOccasionChip() {
   chip.classList.toggle('active', isToday);
 }
 
-// CALENDAR 항목(md만 있음) → {name,topic,md,m,d,diff} 정규화
+// CALENDAR 항목 → {name,topic,md,m,d,diff} 정규화 (다가오는 가장 가까운 회차 기준)
 function occFromCal(o) {
-  const [mm, dd] = o.md.split('-').map(Number);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  let diff = Infinity;
+  let best = null;
   for (const yy of [now.getFullYear(), now.getFullYear() + 1]) {
-    const df = Math.round((new Date(yy, mm - 1, dd) - today) / 86400000);
-    if (df >= 0 && df < diff) diff = df;
+    const md = calMd(o, yy);
+    if (!md) continue;
+    const [mm, dd] = md.split('-').map(Number);
+    const diff = Math.round((new Date(yy, mm - 1, dd) - today) / 86400000);
+    if (diff >= 0 && (!best || diff < best.diff)) best = { ...o, md, m: mm, d: dd, diff };
   }
-  return { ...o, m: mm, d: dd, diff };
+  if (best) return best;
+  // 음력 표 범위 밖(수년 뒤) 폴백 — 올해 날짜라도 있으면 그걸로 표시
+  const md = calMd(o, now.getFullYear()) || '01-01';
+  const [mm, dd] = md.split('-').map(Number);
+  return { ...o, md, m: mm, d: dd, diff: Infinity };
 }
 
 // 계기별 영상 수 { n, mode } — 전용(tag) 우선, 없으면 주제(topic) 폴백
@@ -253,6 +291,8 @@ function matches(v) {
   if (state.time !== 'all' && v.minutes !== state.time) return false;
   if (state.grade !== 'all' && !(v.grade || []).includes(state.grade)) return false;
   if (state.topic !== 'all' && v.topic !== state.topic) return false;
+  // 검색어: 제목·소개·주제에서 찾음 (다른 필터·저장함·계기교육 위에 겹쳐 적용)
+  if (normQ && !norm(`${v.title} ${v.description || ''} ${v.topic}`).includes(normQ)) return false;
   return true;
 }
 
@@ -300,14 +340,20 @@ function renderGrid() {
     gridTitle.textContent = occasionHasTags
       ? `📅 ${activeOcc.name} (${when}) 계기교육`
       : `📅 ${activeOcc.name} (${when}) 계기교육 · ${activeOcc.topic} 주제`;
+  } else if (state.savedOnly) {
+    gridTitle.textContent = '⭐ 저장함';
+  } else if (state.q) {
+    gridTitle.textContent = `🔍 '${state.q}' 검색 결과`;
   } else {
-    gridTitle.textContent = state.savedOnly ? '⭐ 저장함' : '영상 둘러보기';
+    gridTitle.textContent = '영상 둘러보기';
   }
   resultCount.textContent = `${list.length}개`;
   grid.innerHTML = '';
   if (list.length === 0) {
     emptyMsg.hidden = false;
-    if (state.occasionOn && activeOcc) {
+    if (state.q) {
+      emptyMsg.textContent = `'${state.q}'에 맞는 영상이 없어요. 다른 검색어를 써보거나 검색어를 지워보세요.`;
+    } else if (state.occasionOn && activeOcc) {
       emptyMsg.textContent = `${activeOcc.name} 계기교육 영상이 아직 없어요.`;
     } else if (state.savedOnly) {
       emptyMsg.textContent = '아직 저장한 영상이 없어요. 마음에 드는 영상을 ⭐ 저장해 보세요.';
@@ -436,6 +482,22 @@ function bindEvents() {
   $('reshuffleBtn').addEventListener('click', reshuffleToday);
   $('occasionChip').addEventListener('click', toggleOccasion);
 
+  // ── 검색 ──
+  const searchInput = $('searchInput');
+  const searchClear = $('searchClear');
+  function applySearch(raw) {
+    state.q = raw.trim();
+    normQ = norm(state.q);
+    searchClear.hidden = !state.q;
+    renderGrid();
+  }
+  searchInput.addEventListener('input', () => applySearch(searchInput.value));
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    applySearch('');
+    searchInput.focus();
+  });
+
   $('savedBtn').addEventListener('click', () => {
     state.savedOnly = !state.savedOnly;
     state.occasionOn = false; activeOcc = null;
@@ -486,7 +548,16 @@ function bindEvents() {
 
   document.querySelectorAll('[data-close]').forEach(el =>
     el.addEventListener('click', closeModal));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeCal(); } });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    // 검색창에 검색어가 있으면 Esc는 검색어만 지움
+    if (document.activeElement === searchInput && searchInput.value) {
+      searchInput.value = '';
+      applySearch('');
+      return;
+    }
+    closeModal(); closeCal();
+  });
 }
 
 // ── 계기교육 달력 모달 ────────────────────────────────────
@@ -494,9 +565,12 @@ function bindEvents() {
 function findOccasionForDate(mm, dd) {
   const doy = (m, d) => Math.round((new Date(2025, m - 1, d) - new Date(2025, 0, 0)) / 86400000);
   const target = doy(mm, dd);
+  const year = new Date().getFullYear();
   let best = null, bestDelta = Infinity;
   for (const o of CALENDAR) {
-    const [om, od] = o.md.split('-').map(Number);
+    const md = calMd(o, year) || calMd(o, year + 1);   // 음력: 올해 날짜 우선, 없으면 내년
+    if (!md) continue;
+    const [om, od] = md.split('-').map(Number);
     const delta = (doy(om, od) - target + 366) % 366;   // 그 날 이후 가장 가까운 계기(연말 wrap)
     if (delta < bestDelta) { bestDelta = delta; best = o; }
   }
@@ -508,8 +582,15 @@ function buildCalList() {
   list.innerHTML = '';
   const byMonth = {};
   CALENDAR.forEach(o => {
-    const m = Number(o.md.split('-')[0]);
-    (byMonth[m] = byMonth[m] || []).push(o);
+    // 음력 명절은 다가오는 회차의 날짜로 표시(올해 회차가 지났으면 내년 날짜)
+    let md = o.md;
+    if (o.lunar) {
+      const occ = occFromCal(o);
+      if (occ.diff === Infinity) return;   // 음력 표 범위 밖 — LUNAR_MD에 연도를 추가하면 다시 나타남
+      md = occ.md;
+    }
+    const m = Number(md.split('-')[0]);
+    (byMonth[m] = byMonth[m] || []).push({ ...o, md });
   });
   Object.keys(byMonth).map(Number).sort((a, b) => a - b).forEach(m => {
     const h = document.createElement('div');
