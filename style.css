@@ -283,6 +283,46 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   font-weight: 900;
 }
 
+/* 검색 입력 */
+.search-row .search-box { position: relative; flex: 1; max-width: 440px; }
+.search-box input {
+  width: 100%;
+  font: inherit;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--card);
+  padding: 9px 40px 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: border-color .12s, box-shadow .12s;
+}
+.search-box input::placeholder { color: #AAB2C0; font-weight: 600; }
+.search-box input:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(255,183,3,0.22);
+}
+.search-box input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.search-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: .85rem;
+  color: var(--sub);
+  background: #F0F2F7;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.search-clear:hover { background: #E4E7EE; color: var(--ink); }
+
 /* 계기교육 칩 — 네이비로 강조 */
 .chip-occasion {
   background: var(--navy);
@@ -489,6 +529,7 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   .brand-title { font-size: 1.7rem; }
   .hero-title { font-size: 3rem; }
   .chip { font-size: 1.02rem; padding: 9px 18px; }
+  .search-box input { font-size: 1.02rem; }
   .card-title { font-size: 1.1rem; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 }
@@ -503,4 +544,5 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   .today-card .tc-thumb { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); }
   .filter-label { width: 100%; }
   .filter-row { flex-direction: column; gap: 8px; }
+  .search-row .search-box { width: 100%; max-width: none; }
 }
