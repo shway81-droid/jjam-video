@@ -88,7 +88,7 @@ body {
 }
 .brand { display: flex; align-items: center; gap: 12px; }
 .logo-mark { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; }
-.logo-mark svg { display: block; width: 46px; height: 46px; filter: drop-shadow(0 5px 9px rgba(0,0,0,0.35)); }
+.logo-mark svg, .logo-mark img { display: block; width: 46px; height: 46px; filter: drop-shadow(0 5px 9px rgba(0,0,0,0.35)); }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-title {
   font-size: 1.45rem;
