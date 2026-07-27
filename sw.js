@@ -22,6 +22,7 @@ const PRECACHE = [
   './index.html',
   './style.css',
   './app.js',
+  './shared/jjam-switcher.js',
   './data/videos.index.json',
   './data/videos.detail.json',
   './favicon.svg',

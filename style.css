@@ -97,7 +97,9 @@ body {
   letter-spacing: -0.01em;
 }
 .brand-sub { font-size: 0.8rem; color: #9DB0D8; font-weight: 600; }
-.topbar-actions { display: flex; gap: 10px; }
+/* align-items 를 명시한다 — 기본값 stretch 라, 옆에 키 큰 항목(자매 사이트
+   바로가기)이 들어오면 기존 버튼까지 같이 늘어난다. */
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
 
 /* 헤더 토글 버튼 (광고 제거·저장함·전체화면) */
 .wood-btn {
