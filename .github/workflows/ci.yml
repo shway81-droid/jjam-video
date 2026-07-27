@@ -1,0 +1,24 @@
+name: CI
+
+# PR·푸시 시 data/videos.json 정적 검증을 실행하는 게이트.
+# (배포 워크플로우 pages.yml과 분리 — 검증 실패한 데이터가 배포되지 않도록 PR 단계에서 차단)
+#
+# 네트워크가 필요한 스크립트(check-links.mjs·check-ads.mjs)는 유튜브 응답에 따라
+# 불안정하므로 이 게이트에 넣지 않는다. 필요할 때 수동으로 실행한다.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 영상 데이터 검증
+        run: node scripts/validate-data.mjs
