@@ -1,7 +1,8 @@
 /* ===================================================================
-   짬짬이 영상 — 클린 클래스룸 테마
+   짬짬이 영상 — 클린 클래스룸 + 소프트 3D · 다색 (2026 트렌드)
    짬짬이 교실(리뉴얼) 디자인 언어 계승:
    네이비 헤더 + 밝은 본문(#F5F7FA) + 화이트 카드 + 앰버 포인트
+   아이콘은 브랜드 2색(네이비·앰버)을 조합한 소프트 3D SVG 스프라이트
    부드러운 그림자 / 둥근 모서리 / Pretendard
    =================================================================== */
 
@@ -19,9 +20,26 @@
   --radius:    14px;
   --shadow-card: 0 1px 3px rgba(21,36,71,0.06);
   --shadow-hover: 0 10px 24px rgba(21,36,71,0.14);
+  /* 소프트 3D 그라디언트 (브랜드 2색) */
+  --grad-amber: linear-gradient(135deg, #FFD34D 10%, #FFB703 55%, #E09E00 100%);
+  --grad-navy:  linear-gradient(135deg, #2A4378 0%, #152447 100%);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── 소프트 3D 아이콘 공통 ── */
+.s3d {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+  vertical-align: -0.22em;
+  filter: drop-shadow(0 3px 5px rgba(21,36,71,0.28));
+}
+.s3d-12 { width: 13px; height: 13px; }
+.s3d-16 { width: 16px; height: 16px; }
+.s3d-18 { width: 18px; height: 18px; }
+.s3d-20 { width: 20px; height: 20px; }
+.s3d-22 { width: 22px; height: 22px; }
+.s3d-24 { width: 24px; height: 24px; }
 
 body {
   font-family: 'Pretendard Variable', -apple-system, 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -50,7 +68,7 @@ body {
 }
 .brand { display: flex; align-items: center; gap: 12px; }
 .logo-mark { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; }
-.logo-mark svg { border-radius: 12px; display: block; }
+.logo-mark svg { display: block; width: 46px; height: 46px; filter: drop-shadow(0 5px 9px rgba(0,0,0,0.35)); }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-title {
   font-size: 1.45rem;
@@ -82,7 +100,7 @@ body {
 .wood-btn:active { transform: translateY(1px); }
 /* 광고 제거 토글 켜짐 상태 */
 .wood-btn.on {
-  background: var(--amber);
+  background: var(--grad-amber);
   border-color: var(--amber);
   color: var(--navy);
 }
@@ -113,17 +131,19 @@ body {
 .cta-copy b { color: var(--navy); font-weight: 900; }
 .cta-actions { margin-left: auto; display: flex; gap: 12px; flex-wrap: wrap; }
 .roulette-cta {
+  display: inline-flex; align-items: center; gap: 9px;
   font-family: inherit;
   font-size: 1.05rem; font-weight: 900; color: #fff;
-  background: var(--navy);
+  background: var(--grad-navy);
   border: 0; border-radius: 12px;
   box-shadow: 0 4px 14px rgba(21,36,71,0.25);
   padding: 13px 26px; cursor: pointer;
-  transition: transform 0.1s, background 0.12s;
+  transition: transform 0.1s, filter 0.12s;
 }
-.roulette-cta:hover { background: var(--navy-2); transform: translateY(-1px); }
+.roulette-cta:hover { filter: brightness(1.18); transform: translateY(-1px); }
 .roulette-cta:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(21,36,71,0.25); }
 .reshuffle-cta {
+  display: inline-flex; align-items: center; gap: 9px;
   font-family: inherit;
   font-size: 1.05rem; font-weight: 800; color: var(--navy);
   background: var(--card);
@@ -179,13 +199,15 @@ body {
 }
 .today-card .tc-text { padding: 15px 18px; }
 .today-card .tc-tag {
-  display: inline-block;
-  background: var(--amber);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--grad-amber);
   color: var(--navy);
   border-radius: 999px;
   font-size: .76rem;
   font-weight: 900;
-  padding: 3px 11px;
+  padding: 3px 11px 3px 7px;
   margin-bottom: 9px;
 }
 .today-card .tc-title { font-size: 1.2rem; font-weight: 900; line-height: 1.3; margin-bottom: 6px; }
@@ -203,19 +225,20 @@ body {
 
 /* ── 주요 버튼 (앰버 포인트) ── */
 .gold-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   font-family: inherit;
   padding: 13px 26px;
   font-size: 1.05rem;
   font-weight: 900;
   color: var(--navy);
-  background: var(--amber);
+  background: var(--grad-amber);
   border: 0;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(255,183,3,0.35);
   cursor: pointer;
-  transition: transform 0.1s, background 0.12s;
+  transition: transform 0.1s, filter 0.12s;
 }
-.gold-btn:hover { background: #FFC533; transform: translateY(-1px); }
+.gold-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
 .gold-btn:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(255,183,3,0.35); }
 .gold-btn.big { font-size: 1.15rem; padding: 15px 30px; }
 /* 보조(고스트) 버튼 — 흰 배경 + 라인 */
@@ -227,7 +250,7 @@ body {
 }
 .gold-btn.ghost:hover { background: #F0F2F7; }
 /* <a>로 만든 버튼(유튜브에서 보기)도 버튼처럼 보이게 */
-a.gold-btn { display: inline-block; text-decoration: none; text-align: center; line-height: 1.2; }
+a.gold-btn { text-decoration: none; text-align: center; line-height: 1.2; }
 
 /* 프리미엄 안내 문구 */
 .premium-note {
@@ -256,7 +279,10 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
 .filter-row + .filter-row { border-top: 1px solid var(--line); }
 .filter-label {
   flex-shrink: 0;
-  width: 62px;
+  width: 74px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-weight: 800;
   color: var(--ink);
   padding-top: 7px;
@@ -277,7 +303,7 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
 }
 .chip:hover { background: #F0F2F7; }
 .chip.active {
-  background: var(--amber);
+  background: var(--grad-amber);
   border-color: var(--amber);
   color: var(--navy);
   font-weight: 900;
@@ -332,11 +358,12 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
 }
 .chip-occasion:hover { background: var(--navy-2); }
 .chip-occasion.active {
-  background: var(--amber);
+  background: var(--grad-amber);
   border-color: var(--amber);
   color: var(--navy);
 }
-.chip-cal { background: var(--card); }
+.chip-cal { background: var(--card); display: inline-flex; align-items: center; gap: 6px; }
+.chip-occasion { display: inline-flex; align-items: center; gap: 6px; }
 
 /* ── 계기교육 달력 모달 ── */
 .cal-panel { width: min(680px, 100%); }
@@ -345,7 +372,7 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   gap: 12px; flex-wrap: wrap;
   padding: 20px 22px 8px;
 }
-.cal-head h3 { font-size: 1.3rem; font-weight: 900; color: var(--navy); }
+.cal-head h3 { font-size: 1.3rem; font-weight: 900; color: var(--navy); display: flex; align-items: center; gap: 9px; }
 .cal-datepick {
   font-size: .9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--ink);
 }
@@ -381,7 +408,7 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   justify-content: space-between;
   margin-bottom: 16px;
 }
-.grid-head h2 { color: var(--navy); font-size: 1.35rem; font-weight: 900; }
+.grid-head h2 { color: var(--navy); font-size: 1.35rem; font-weight: 900; display: flex; align-items: center; gap: 9px; }
 .result-count { color: var(--sub); font-weight: 700; }
 
 .grid {
@@ -433,6 +460,9 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
 .pill-grade { background: #E4F3E6; color: #3B8C47; }
 .card-star {
   align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: .78rem;
   font-weight: 800;
   color: var(--amber-dark);
@@ -503,7 +533,7 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   padding: 16px 18px;
   margin-bottom: 18px;
 }
-.ideas-head { font-size: 1.05rem; font-weight: 900; color: var(--navy); margin-bottom: 12px; }
+.ideas-head { font-size: 1.05rem; font-weight: 900; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 .ideas-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .ideas-list li { padding-left: 30px; position: relative; line-height: 1.5; font-weight: 500; }
 .ideas-list li::before {
@@ -511,7 +541,8 @@ a.gold-btn { display: inline-block; text-decoration: none; text-align: center; l
   position: absolute;
   left: 0; top: 1px;
   width: 22px; height: 22px;
-  background: var(--amber);
+  background: var(--grad-amber);
+  box-shadow: 0 2px 4px rgba(21,36,71,0.18);
   color: var(--navy);
   border-radius: 7px;
   font-size: .78rem;

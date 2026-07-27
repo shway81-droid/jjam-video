@@ -148,6 +148,14 @@ function gradeLabel(v) {
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 // 검색 비교용 정규화 — 소문자화 + 공백 제거('지식 채널'로 '지식채널e'도 찾도록)
 function norm(s) { return String(s).toLowerCase().replace(/\s+/g, ''); }
+// 소프트 3D 아이콘(index.html 스프라이트) 마크업
+function s3d(name, size = 16) {
+  return `<svg class="s3d s3d-${size}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+}
+// 그리드 제목: 아이콘(고정 마크업) + 텍스트(escape) — 검색어 등 사용자 입력 안전 처리
+function setGridTitle(iconName, text) {
+  gridTitle.innerHTML = (iconName ? s3d(iconName, 24) : '') + `<span>${escapeHtml(text)}</span>`;
+}
 
 // ── 필터 칩 렌더링 ────────────────────────────────────────
 function makeChip(label, active, onClick) {
@@ -216,7 +224,7 @@ function renderOccasionChip() {
   const chip = $('occasionChip');
   if (!OCCASION) { chip.hidden = true; return; }
   const tag = OCCASION.diff === 0 ? '오늘의 계기' : `D-${OCCASION.diff}`;
-  chip.textContent = `📅 ${tag} · ${OCCASION.name}`;
+  chip.innerHTML = `${s3d('calendar')} ${tag} · ${escapeHtml(OCCASION.name)}`;
   // 칩은 '오늘의 계기'가 활성일 때만 강조(달력에서 다른 계기를 고르면 해제된 것처럼)
   const isToday = state.occasionOn && activeOcc && activeOcc.name === OCCASION.name;
   chip.classList.toggle('active', isToday);
@@ -317,7 +325,7 @@ function makeCard(v) {
 
   const body = document.createElement('div');
   body.className = 'card-body';
-  const star = saved.has(v.id) ? '<span class="card-star">⭐ 저장됨</span>' : '';
+  const star = saved.has(v.id) ? `<span class="card-star">${s3d('star', 12)} 저장됨</span>` : '';
   body.innerHTML = `
     ${star}
     <div class="card-title">${escapeHtml(v.title)}</div>
@@ -337,15 +345,15 @@ function renderGrid() {
   const list = VIDEOS.filter(matches);
   if (state.occasionOn && activeOcc) {
     const when = activeOcc.diff === 0 ? '오늘' : `${activeOcc.m}/${activeOcc.d}`;
-    gridTitle.textContent = occasionHasTags
-      ? `📅 ${activeOcc.name} (${when}) 계기교육`
-      : `📅 ${activeOcc.name} (${when}) 계기교육 · ${activeOcc.topic} 주제`;
+    setGridTitle('calendar', occasionHasTags
+      ? `${activeOcc.name} (${when}) 계기교육`
+      : `${activeOcc.name} (${when}) 계기교육 · ${activeOcc.topic} 주제`);
   } else if (state.savedOnly) {
-    gridTitle.textContent = '⭐ 저장함';
+    setGridTitle('star', '저장함');
   } else if (state.q) {
-    gridTitle.textContent = `🔍 '${state.q}' 검색 결과`;
+    setGridTitle('search', `'${state.q}' 검색 결과`);
   } else {
-    gridTitle.textContent = '영상 둘러보기';
+    setGridTitle(null, '영상 둘러보기');
   }
   resultCount.textContent = `${list.length}개`;
   grid.innerHTML = '';
@@ -376,7 +384,7 @@ function renderToday(v) {
     <div class="tc-inner">
       ${thumb}
       <div class="tc-text">
-        <span class="tc-tag">🍿 오늘의 추천 · ${v.minutes}분</span>
+        <span class="tc-tag">${s3d('spark')} 오늘의 추천 · ${v.minutes}분</span>
         <div class="tc-title">${escapeHtml(v.title)}</div>
         <div class="tc-desc">${escapeHtml(v.description || '')}</div>
       </div>
@@ -447,13 +455,13 @@ function closeModal() {
 function updateSaveBtn() {
   const b = $('mSaveBtn');
   const on = modalVideo && saved.has(modalVideo.id);
-  b.textContent = on ? '⭐ 저장됨' : '⭐ 저장';
+  b.innerHTML = `${s3d('star', 18)} ${on ? '저장됨' : '저장'}`;
   b.classList.toggle('ghost', !on);
 }
 function updatePremiumBtn() {
   const b = $('premiumBtn');
   if (!b) return;
-  b.textContent = premiumOn ? '✅ 광고 제거 켜짐(프리미엄)' : '🚫 광고 제거(프리미엄)';
+  b.innerHTML = `${s3d('noads', 18)} ${premiumOn ? '광고 제거 켜짐(프리미엄)' : '광고 제거(프리미엄)'}`;
   b.classList.toggle('on', premiumOn);
   b.setAttribute('aria-pressed', premiumOn ? 'true' : 'false');
 }

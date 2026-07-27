@@ -10,10 +10,104 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- ── 소프트 3D 아이콘 스프라이트 (브랜드 2색: 네이비·앰버 조합) ── -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFD95E"/><stop offset=".55" stop-color="#FFB703"/><stop offset="1" stop-color="#E09E00"/>
+      </linearGradient>
+      <linearGradient id="gN" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#33508F"/><stop offset="1" stop-color="#101C38"/>
+      </linearGradient>
+    </defs>
+    <symbol id="i-play" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gA)"/>
+      <circle cx="50" cy="52" r="24" fill="url(#gN)"/>
+      <path d="M44.5 41 L44.5 63 L63 52 Z" fill="url(#gA)"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".5" transform="rotate(-18 31 21)"/>
+    </symbol>
+    <symbol id="i-noads" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gN)"/>
+      <circle cx="50" cy="52" r="22" stroke="url(#gA)" stroke-width="9" fill="none"/>
+      <line x1="36" y1="38" x2="64" y2="66" stroke="url(#gA)" stroke-width="9" stroke-linecap="round"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 31 21)"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gN)"/>
+      <polygon points="50,26 58,44 78,46 63,59 67,79 50,68.5 33,79 37,59 22,46 42,44" fill="url(#gA)"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 31 21)"/>
+    </symbol>
+    <symbol id="i-dice" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gA)"/>
+      <circle cx="31" cy="33" r="7.5" fill="url(#gN)"/><circle cx="69" cy="33" r="7.5" fill="url(#gN)"/>
+      <circle cx="50" cy="52" r="7.5" fill="url(#gN)"/>
+      <circle cx="31" cy="71" r="7.5" fill="url(#gN)"/><circle cx="69" cy="71" r="7.5" fill="url(#gN)"/>
+      <ellipse cx="31" cy="19" rx="15" ry="6.5" fill="#fff" opacity=".5" transform="rotate(-18 31 19)"/>
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gN)"/>
+      <path d="M68 66 A25 25 0 1 1 72 45" stroke="url(#gA)" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <polygon points="60,36 84,32 76,55" fill="url(#gA)"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 31 21)"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gA)"/>
+      <circle cx="50" cy="52" r="27" fill="url(#gN)"/>
+      <circle cx="50" cy="52" r="20" fill="#FFF7E0"/>
+      <path d="M50 52 L50 38" stroke="url(#gN)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M50 52 L60 58" stroke="url(#gN)" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="50" cy="52" r="3.5" fill="url(#gN)"/>
+      <ellipse cx="30" cy="19" rx="14" ry="6" fill="#fff" opacity=".55" transform="rotate(-20 30 19)"/>
+    </symbol>
+    <symbol id="i-kids" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gN)"/>
+      <circle cx="38" cy="42" r="10" fill="url(#gA)"/>
+      <path d="M22 76 Q38 56 54 76 Z" fill="url(#gA)"/>
+      <circle cx="65" cy="46" r="8" fill="#FFD34D"/>
+      <path d="M52 76 Q65 61 78 76 Z" fill="#FFD34D"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 31 21)"/>
+    </symbol>
+    <symbol id="i-tag" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gA)"/>
+      <path d="M34 26 L52 26 Q57 26 60.5 29.5 L76 45 Q81 50 76 55 L55 76 Q50 81 45 76 L29.5 60.5 Q26 57 26 52 L26 34 Q26 26 34 26 Z" fill="url(#gN)"/>
+      <circle cx="40" cy="40" r="6" fill="url(#gA)"/>
+      <ellipse cx="31" cy="18" rx="14" ry="6" fill="#fff" opacity=".5" transform="rotate(-18 31 18)"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 100 100">
+      <rect x="6" y="14" width="88" height="80" rx="20" fill="url(#gA)"/>
+      <path d="M6 42 L6 34 Q6 14 26 14 L74 14 Q94 14 94 34 L94 42 Z" fill="url(#gN)"/>
+      <rect x="26" y="4" width="10" height="20" rx="5" fill="url(#gN)"/>
+      <rect x="64" y="4" width="10" height="20" rx="5" fill="url(#gN)"/>
+      <circle cx="33" cy="60" r="6.5" fill="url(#gN)"/>
+      <circle cx="52" cy="60" r="6.5" fill="url(#gN)" opacity=".35"/>
+      <circle cx="33" cy="77" r="6.5" fill="url(#gN)" opacity=".35"/>
+      <ellipse cx="30" cy="50" rx="14" ry="5" fill="#fff" opacity=".5" transform="rotate(-10 30 50)"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gN)"/>
+      <circle cx="44" cy="46" r="16" stroke="url(#gA)" stroke-width="9" fill="none"/>
+      <line x1="57" y1="59" x2="72" y2="74" stroke="url(#gA)" stroke-width="10" stroke-linecap="round"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 31 21)"/>
+    </symbol>
+    <symbol id="i-spark" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gA)"/>
+      <path d="M50 24 L57 45 L78 52 L57 59 L50 80 L43 59 L22 52 L43 45 Z" fill="url(#gN)"/>
+      <circle cx="72" cy="30" r="5" fill="#fff" opacity=".85"/>
+      <ellipse cx="29" cy="19" rx="13" ry="6" fill="#fff" opacity=".5" transform="rotate(-18 29 19)"/>
+    </symbol>
+    <symbol id="i-bulb" viewBox="0 0 100 100">
+      <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gN)"/>
+      <circle cx="50" cy="45" r="17" fill="url(#gA)"/>
+      <path d="M42 58 L58 58 L56 70 Q50 74 44 70 Z" fill="url(#gA)"/>
+      <path d="M50 38 L50 48 M44 42 L56 42" stroke="url(#gN)" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="31" cy="21" rx="15" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 31 21)"/>
+    </symbol>
+  </svg>
+
   <!-- ── 상단 우드 프레임 헤더 ── -->
   <header class="topbar">
     <div class="brand">
-      <div class="logo-mark"><svg viewBox="0 0 100 100" width="46" height="46" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="100" height="100" rx="24" fill="#FFB703"/><circle cx="50" cy="52" r="30" fill="#152447"/><path d="M43 38 L43 66 L67 52 Z" fill="#FFB703"/><circle cx="79" cy="21" r="7" fill="#FFFFFF"/><circle cx="79" cy="21" r="3" fill="#152447"/></svg></div>
+      <div class="logo-mark"><svg class="s3d" viewBox="0 0 100 100" width="46" height="46" aria-hidden="true"><use href="#i-play"/></svg></div>
       <div class="brand-text">
         <span class="brand-title">짬짬이 영상</span>
         <span class="brand-sub">자투리 시간, 딱 맞는 수업 영상</span>
@@ -21,9 +115,10 @@
     </div>
     <div class="topbar-actions">
       <button id="premiumBtn" class="wood-btn" type="button"
-        title="유튜브 프리미엄 회원이면 켜세요. 임베드에 유튜브 로그인을 적용해 광고를 제거합니다.">🚫 광고 제거</button>
+        title="유튜브 프리미엄 회원이면 켜세요. 임베드에 유튜브 로그인을 적용해 광고를 제거합니다.">광고 제거</button>
       <button id="savedBtn" class="wood-btn" type="button">
-        <span>⭐ 저장함</span>
+        <svg class="s3d s3d-18" aria-hidden="true"><use href="#i-star"/></svg>
+        <span>저장함</span>
         <span id="savedCount" class="badge">0</span>
       </button>
       <button id="fsBtn" class="wood-btn" type="button" title="전체화면">⛶</button>
@@ -34,8 +129,8 @@
   <div class="cta-strip">
     <p class="cta-copy"><b>수업 자투리 시간,</b> 준비 없이 바로 트는 교육 영상 <b id="ctaCount">425</b>편 · 설치 없음 · 로그인 없음</p>
     <div class="cta-actions">
-      <button id="rouletteBtn" class="roulette-cta" type="button">🎲 룰렛으로 골라줘</button>
-      <button id="reshuffleBtn" class="reshuffle-cta" type="button">↻ 추천 새로 받기</button>
+      <button id="rouletteBtn" class="roulette-cta" type="button"><svg class="s3d s3d-22" aria-hidden="true"><use href="#i-dice"/></svg>룰렛으로 골라줘</button>
+      <button id="reshuffleBtn" class="reshuffle-cta" type="button"><svg class="s3d s3d-22" aria-hidden="true"><use href="#i-refresh"/></svg>추천 새로 받기</button>
     </div>
   </div>
 
@@ -50,7 +145,7 @@
     <!-- ── 필터 바 ── -->
     <section class="filters">
       <div class="filter-row search-row">
-        <span class="filter-label">🔍 검색</span>
+        <span class="filter-label"><svg class="s3d s3d-20" aria-hidden="true"><use href="#i-search"/></svg>검색</span>
         <div class="search-box">
           <input type="search" id="searchInput" placeholder="제목·내용으로 찾기 (예: 독도, 지진, 광복절)"
             autocomplete="off" enterkeyhint="search" aria-label="영상 검색" />
@@ -58,22 +153,22 @@
         </div>
       </div>
       <div class="filter-row occasion-row">
-        <span class="filter-label">📅 계기</span>
+        <span class="filter-label"><svg class="s3d s3d-20" aria-hidden="true"><use href="#i-calendar"/></svg>계기</span>
         <div class="chips">
           <button id="occasionChip" class="chip chip-occasion" type="button">계기교육</button>
-          <button id="calBtn" class="chip chip-cal" type="button">🗓️ 달력</button>
+          <button id="calBtn" class="chip chip-cal" type="button"><svg class="s3d s3d-16" aria-hidden="true"><use href="#i-calendar"/></svg>달력</button>
         </div>
       </div>
       <div class="filter-row">
-        <span class="filter-label">⏱ 시간</span>
+        <span class="filter-label"><svg class="s3d s3d-20" aria-hidden="true"><use href="#i-clock"/></svg>시간</span>
         <div id="timeChips" class="chips"></div>
       </div>
       <div class="filter-row">
-        <span class="filter-label">👥 학년</span>
+        <span class="filter-label"><svg class="s3d s3d-20" aria-hidden="true"><use href="#i-kids"/></svg>학년</span>
         <div id="gradeChips" class="chips"></div>
       </div>
       <div class="filter-row">
-        <span class="filter-label">🏷 주제</span>
+        <span class="filter-label"><svg class="s3d s3d-20" aria-hidden="true"><use href="#i-tag"/></svg>주제</span>
         <div id="topicChips" class="chips wrap"></div>
       </div>
     </section>
@@ -106,11 +201,11 @@
         <h3 id="mTitle" class="modal-title"></h3>
         <p id="mDesc" class="modal-desc"></p>
         <div class="ideas">
-          <h4 class="ideas-head">🧩 이렇게 써보세요</h4>
+          <h4 class="ideas-head"><svg class="s3d s3d-22" aria-hidden="true"><use href="#i-bulb"/></svg>이렇게 써보세요</h4>
           <ul id="mIdeas" class="ideas-list"></ul>
         </div>
         <div class="modal-actions">
-          <button id="mSaveBtn" class="gold-btn" type="button">⭐ 저장</button>
+          <button id="mSaveBtn" class="gold-btn" type="button"><svg class="s3d s3d-18" aria-hidden="true"><use href="#i-star"/></svg>저장</button>
           <a id="mYtBtn" class="gold-btn ghost" target="_blank" rel="noopener" title="유튜브에서 열기 (프리미엄 회원은 광고 없이 시청)">▶ 유튜브에서 보기</a>
           <button id="mShareBtn" class="gold-btn ghost" type="button">🔗 공유</button>
         </div>
@@ -125,7 +220,7 @@
     <div class="modal-panel cal-panel" role="dialog" aria-modal="true" aria-labelledby="calHeadTitle">
       <button class="modal-close" data-cal-close type="button" aria-label="닫기">✕</button>
       <div class="cal-head">
-        <h3 id="calHeadTitle">🗓️ 계기교육 달력</h3>
+        <h3 id="calHeadTitle"><svg class="s3d s3d-24" aria-hidden="true"><use href="#i-calendar"/></svg>계기교육 달력</h3>
         <label class="cal-datepick">날짜로 찾기
           <input type="date" id="calDate" />
         </label>
