@@ -6,6 +6,24 @@
    부드러운 그림자 / 둥근 모서리 / Pretendard
    =================================================================== */
 
+/* ── 웹폰트: Pretendard(가변) 자가 호스팅 ──────────────────────────
+   외부 CDN을 쓰지 않는다. 교사 PC에 Pretendard가 깔려 있든 아니든 화면이 동일해진다.
+
+   assets/fonts/PretendardVariable.subset.woff2 는 짬짬이 4개 사이트가 실제로
+   쓰는 글자만 남긴 서브셋(290 KB)이다. 서브셋에 없는 글자는 tofu(□)가 아니라
+   font-family의 다음 순위(시스템 한글 폰트)로 자연스럽게 넘어간다.
+   새 글자가 들어왔는지는 `node scripts/check-font-coverage.mjs` 가 확인한다.
+
+   라이선스: SIL Open Font License 1.1 — assets/fonts/LICENSE.txt
+   ────────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-style: normal;
+  font-weight: 45 920;                 /* 가변 굵기 축 */
+  font-display: swap;                  /* 폰트 대기 중에도 글자를 먼저 보여 준다 */
+  src: url('assets/fonts/PretendardVariable.subset.woff2') format('woff2-variations');
+}
+
 :root {
   --navy:      #152447;   /* 헤더·주요 버튼 */
   --navy-2:    #1F3468;

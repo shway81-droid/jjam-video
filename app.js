@@ -412,6 +412,37 @@ function roulette() {
   }, 90);
 }
 
+// ── 모달용 상세 데이터 (지연 로딩) ────────────────────────
+// 활용 아이디어는 모달을 열 때만 쓰므로 첫 화면 요청에서 빼 두었다.
+// 첫 화면을 그린 직후 배경에서 받아오고, 그전에 모달을 열면 도착하는 대로 채운다.
+let DETAIL = null;
+let detailPromise = null;
+function loadDetail() {
+  if (!detailPromise) {
+    detailPromise = fetch('data/videos.detail.json', { cache: 'no-cache' })
+      .then((r) => r.json())
+      .then((d) => { DETAIL = d; })
+      .catch(() => { DETAIL = {}; });   // 실패해도 모달 자체는 열리게 둔다
+  }
+  return detailPromise;
+}
+
+function renderIdeas(v) {
+  const ul = $('mIdeas');
+  ul.innerHTML = '';
+  const fill = () => {
+    if (modalVideo !== v) return;      // 그 사이 다른 영상을 열었으면 무시
+    ul.innerHTML = '';
+    ((DETAIL && DETAIL[v.id] && DETAIL[v.id].ideas) || []).forEach((t, i) => {
+      const li = document.createElement('li');
+      li.dataset.n = i + 1;
+      li.textContent = t;
+      ul.appendChild(li);
+    });
+  };
+  if (DETAIL) fill(); else loadDetail().then(fill);
+}
+
 // ── 모달 ──────────────────────────────────────────────────
 let modalVideo = null;
 function openModal(v) {
@@ -433,14 +464,7 @@ function openModal(v) {
   $('mTitle').textContent = v.title;
   $('mDesc').textContent  = v.description || '';
 
-  const ideas = $('mIdeas');
-  ideas.innerHTML = '';
-  (v.ideas || []).forEach((t, i) => {
-    const li = document.createElement('li');
-    li.dataset.n = i + 1;
-    li.textContent = t;
-    ideas.appendChild(li);
-  });
+  renderIdeas(v);
 
   updateSaveBtn();
   $('modal').hidden = false;
@@ -648,14 +672,15 @@ async function init() {
   bindEvents();
   persistSaved();
   try {
-    const res = await fetch('data/videos.json', { cache: 'no-cache' });
+    // 목록·필터·검색에 필요한 필드만 담긴 경량 인덱스 (scripts/gen-data.mjs 생성)
+    const res = await fetch('data/videos.index.json', { cache: 'no-cache' });
     VIDEOS = await res.json();
     const ctaCount = document.getElementById('ctaCount');
     if (ctaCount) ctaCount.textContent = VIDEOS.length;
   } catch (e) {
     grid.innerHTML = '';
     emptyMsg.hidden = false;
-    emptyMsg.textContent = 'videos.json을 불러오지 못했어요. 로컬 서버(python -m http.server)로 열어주세요.';
+    emptyMsg.textContent = '영상 목록을 불러오지 못했어요. 로컬 서버(python -m http.server)로 열어주세요.';
     return;
   }
   buildTopics();
@@ -664,6 +689,18 @@ async function init() {
   renderOccasionChip();
   renderGrid();
   reshuffleToday();
+
+  // 첫 화면을 그린 뒤, 모달에서만 쓰는 상세 데이터를 배경에서 미리 받아 둔다.
+  loadDetail();
 }
 
 init();
+
+// ── 오프라인 지원 (PWA) ───────────────────────────────────
+// 한 번 열어 두면 인터넷 없이도 목록·검색·저장함이 동작한다.
+// (유튜브 재생 자체는 인터넷이 필요하다 — 교차 출처라 캐시하지 않는다.)
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => { /* 등록 실패는 무시 — 사이트는 그대로 동작 */ });
+  });
+}

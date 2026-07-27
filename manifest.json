@@ -1,0 +1,15 @@
+{
+  "name": "짬짬이 영상",
+  "short_name": "짬짬이영상",
+  "description": "애매하게 남은 수업 시간, 시간·주제·학년으로 1초 만에 찾는 선생님 전용 영상 아카이브",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F5F7FA",
+  "theme_color": "#152447",
+  "lang": "ko",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

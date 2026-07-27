@@ -22,3 +22,7 @@ jobs:
           node-version: '20'
       - name: 영상 데이터 검증
         run: node scripts/validate-data.mjs
+      - name: 파생 데이터 동기화 확인
+        run: node scripts/gen-data.mjs --check
+      - name: 웹폰트 글자 커버리지 검증
+        run: node scripts/check-font-coverage.mjs

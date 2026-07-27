@@ -49,9 +49,13 @@ jobs:
             echo "추가된 영상 없음 — 커밋 생략."
             exit 0
           fi
+          # 런처가 받는 파생 파일(index·detail)을 원본과 함께 갱신한다.
+          # 빠뜨리면 새로 넣은 영상이 화면에 나오지 않고, CI의 동기화 검사도 실패한다.
+          node scripts/validate-data.mjs
+          node scripts/gen-data.mjs
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           total=$(node -e "console.log(require('./data/videos.json').length)")
-          git add data/videos.json
+          git add data/videos.json data/videos.index.json data/videos.detail.json
           git commit -m "진로 영상 자동 반영: 유튜브 검증 통과분 추가 (총 ${total}편) [skip ci]"
           git push

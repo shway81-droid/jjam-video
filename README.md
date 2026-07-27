@@ -17,20 +17,40 @@
 - **⭐ 저장함** — 마음에 든 영상 담아두기 (브라우저 `localStorage`, 로그인 없음)
 - **🧩 이렇게 써보세요** — 영상마다 수업 활용 아이디어 3가지
 - **📺 전자칠판 최적화** — 1280px 이상 대화면에서 글씨·카드 자동 확대, 전체화면 버튼
+- **📴 오프라인 동작** — PWA + 서비스 워커. 한 번 열어 두면 인터넷 없이도 목록·필터·검색·저장함이
+  동작합니다(학교 크롬북·태블릿). *영상 재생 자체는 유튜브를 부르므로 인터넷이 필요합니다.*
 
 ## 🗂 구조
 
 ```
-index.html        런처 (히어로·필터·그리드·모달) + 소프트 3D 아이콘 스프라이트
-style.css         클린 클래스룸 테마 + 소프트 3D·다색 아이콘 (네이비·앰버 2026 트렌드)
-app.js            필터·룰렛·저장함(localStorage)·모달 재생
-data/videos.json  영상 큐레이션 데이터 (단일 소스)  ← 여기만 수정하면 됨
+index.html               런처 (히어로·필터·그리드·모달) + 소프트 3D 아이콘 스프라이트
+style.css                클린 클래스룸 테마 + 소프트 3D·다색 아이콘 (네이비·앰버 2026 트렌드)
+app.js                   필터·룰렛·저장함(localStorage)·모달 재생
+data/videos.json         영상 큐레이션 데이터 (단일 소스)  ← 여기만 수정하면 됨
+data/videos.index.json   ↳ 목록·필터·검색용 파생 파일 (자동 생성, 직접 수정 금지)
+data/videos.detail.json  ↳ 모달 전용 파생 파일 (자동 생성, 직접 수정 금지)
+assets/fonts/            자가 호스팅 웹폰트 (Pretendard 서브셋, OFL 1.1)
+sw.js · manifest.json    오프라인 지원(PWA)
 favicon.svg
 ```
 
+### 첫 화면이 받는 데이터
+
+`videos.json`은 사람이 읽기 좋게 들여쓴 파일이라 절반 이상이 공백이고, 카드 그리드에서
+쓰지도 않는 `ideas`(활용 아이디어 3가지)까지 들어 있습니다. 그래서 런처는 원본 대신
+`scripts/gen-data.mjs`가 만든 파생 파일을 받습니다.
+
+| | 크기 | 언제 받나 |
+|---|---|---|
+| `videos.json` (원본) | 268 KB | 받지 않음 — 사람이 고치는 파일 |
+| `videos.index.json` | **88 KB** | 첫 화면 (목록·필터·검색) |
+| `videos.detail.json` | 44 KB | 첫 화면을 그린 뒤 배경에서 |
+
+`description`은 검색 대상이라 목록에 남아 있고, `ideas`만 상세로 뺐습니다.
+
 ## ➕ 영상 추가·수정 방법
 
-`data/videos.json` 배열에 항목을 추가하면 끝입니다. (빌드 불필요)
+`data/videos.json` 배열에 항목을 추가한 뒤 `node scripts/gen-data.mjs` 한 줄이면 끝입니다.
 
 ```json
 {
@@ -58,7 +78,9 @@ favicon.svg
 영상을 추가·수정한 뒤 아래를 실행하면 됩니다. (PR·푸시 시 CI가 동일하게 돌립니다)
 
 ```bash
-node scripts/validate-data.mjs
+node scripts/validate-data.mjs      # 데이터가 올바른지
+node scripts/gen-data.mjs           # 파생 파일 재생성 (index·detail)
+node scripts/check-font-coverage.mjs # 자가 호스팅 폰트에 없는 글자가 생겼는지
 ```
 
 필수 필드·`id`/`youtubeId` 중복·학년 이름·`ideas` 3개 규칙을 확인하고, **런처가 실제로 찾을 수
