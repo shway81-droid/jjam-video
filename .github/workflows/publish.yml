@@ -9,6 +9,10 @@ name: 발행 — jjam-classroom 에서 받아 배포
 #   - 즉시 반영하려면 Actions 탭에서 "Run workflow"
 
 on:
+  # 이 워크플로 자체가 바뀌면(=머지되면) 바로 한 번 발행한다
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish.yml']
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
