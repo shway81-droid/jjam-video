@@ -1,5 +1,18 @@
 # 🎬 짬짬이 영상
 
+> [!IMPORTANT]
+> **소스는 이 저장소가 아닙니다.** 코드는
+> [`shway81-droid/jjam-classroom`](https://github.com/shway81-droid/jjam-classroom) 의
+> `video/` 폴더에 있습니다. 고칠 일이 있으면 거기서 고치세요.
+>
+> 여기는 **발행만** 맡습니다. GitHub Pages 주소가 저장소 이름에서 나오기 때문에
+> (`github.io/jjam-video/`), 선생님들이 쓰던 주소를 지키려고 이 저장소를 남겨 두었습니다.
+> `.github/workflows/publish.yml` 이 상류를 받아다 배포합니다.
+>
+> 아래 내용과 이 저장소의 `main` 은 **합치기 전 기록**입니다. 여기서 고쳐도 사이트에
+> 반영되지 않습니다.
+
+
 **애매하게 남은 수업 시간, 뭐 틀지?** — 시간·주제·학년으로 1초 만에 찾는 선생님 전용 영상 아카이브.
 
 [짬짬이 게임](https://shway81-droid.github.io/jjam/)의 클린 클래스룸 디자인과
