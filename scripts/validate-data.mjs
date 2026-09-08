@@ -70,7 +70,7 @@ if (!Array.isArray(videos) || videos.length === 0) {
 
 // ── 항목별 검증 ──────────────────────────────────────────────────
 const REQUIRED = ['id', 'title', 'youtubeId', 'topic', 'grade', 'minutes', 'description', 'ideas'];
-const OPTIONAL = ['occasions', 'noThumb'];
+const OPTIONAL = ['occasions'];
 const ALLOWED = new Set([...REQUIRED, ...OPTIONAL]);
 
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
@@ -145,11 +145,6 @@ videos.forEach((v, i) => {
     err(`${where}: ideas 는 3개여야 합니다 (현재 ${Array.isArray(v.ideas) ? v.ideas.length : '배열 아님'}).`);
   } else if (!v.ideas.every(nonEmptyStr)) {
     err(`${where}: ideas 에 빈 항목이 있습니다.`);
-  }
-
-  // noThumb: 썸네일을 감출 때만 쓰는 스위치. 켜려면 true 하나뿐이라 다른 값은 오타로 본다.
-  if (v.noThumb !== undefined && v.noThumb !== true) {
-    err(`${where}: noThumb 는 true 이거나 아예 없어야 합니다 (현재 ${JSON.stringify(v.noThumb)}).`);
   }
 
   if (v.occasions !== undefined) {
