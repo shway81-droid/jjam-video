@@ -139,6 +139,8 @@ function toggleSaved(id) {
 // ── 유틸 ──────────────────────────────────────────────────
 function thumbUrl(v) {
   if (!v.youtubeId || v.youtubeId === 'SAMPLE') return null;
+  // noThumb: 유튜브 자동 썸네일이 교실에 띄우기 부적절한 영상 — 캡처 대신 ▶ 자리표시자를 쓴다.
+  if (v.noThumb) return null;
   return `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`;
 }
 function gradeLabel(v) {
