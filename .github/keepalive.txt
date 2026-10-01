@@ -1,2 +1,2 @@
 발행 워크플로가 60일 비활동으로 꺼지지 않도록 shway81-droid/jjam-classroom 의 publish-keepalive.yml 이 매달 갱신한다.
-마지막 갱신: 2026-09-30T00:53:49Z
+마지막 갱신: 2026-10-01T13:46:38Z
